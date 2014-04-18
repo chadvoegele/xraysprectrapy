@@ -1,3 +1,3 @@
-from xrayspectrapy.atom import Atom
-from xrayspectrapy.structure import Structure
-from xrayspectrapy import radial_density_function
+from xrayspectrapy.datadefs.atom import Atom
+from xrayspectrapy.datadefs.structure import Structure
+from xrayspectrapy import pdf

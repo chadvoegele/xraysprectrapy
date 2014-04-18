@@ -1,32 +1,21 @@
 import unittest
 import xrayspectrapy as xsp
-from xrayspectrapy import Atom, Structure
-
-class AtomTests(unittest.TestCase):
-    def test_str(self):
-        a = Atom(5, 8, 9)
-        self.assertEqual(str(a), '(5, 8, 9)')
-
-class StructureTests(unittest.TestCase):
-    def test_str(self):
-        s = Structure([Atom(5, 8, 9), Atom(5, 2, 0)])
-        self.assertEqual(str(s), '[(5, 8, 9)(5, 2, 0)]')
 
 class RadialDensityFunctionTests(unittest.TestCase):
     def data_for_test1(self):
-        return Structure([Atom(1.2455, 0.5367, -0.0729),
-                          Atom(0.9239, -0.9952, 0.0237),
-                          Atom(-0.1226, -0.7041, 1.1548)])
+        return xsp.Structure([xsp.Atom(1.2455, 0.5367, -0.0729),
+                          xsp.Atom(0.9239, -0.9952, 0.0237),
+                          xsp.Atom(-0.1226, -0.7041, 1.1548)])
 
     def data_for_test2(self):
-        return Structure([Atom(0.375, 0.375, 0.375),
-                          Atom(0.125, 0.125, 0.625),
-                          Atom(0.375, 0.875, 0.875)])
+        return xsp.Structure([xsp.Atom(0.375, 0.375, 0.375),
+                          xsp.Atom(0.125, 0.125, 0.625),
+                          xsp.Atom(0.375, 0.875, 0.875)])
 
     def test_pairwise_distances(self):
         expectedDistances = [1.5683, 2.2178, 1.5683, 1.5682, 2.2178, 1.5682]
         structure = self.data_for_test1()
-        distances = xsp.radial_density_function.calc_distances(structure)
+        distances = xsp.pdf.calc_distances(structure)
         
         for i in range(0, len(expectedDistances)):
             self.assertAlmostEqual(expectedDistances[i], distances[i], 4)
@@ -83,7 +72,7 @@ class RadialDensityFunctionTests(unittest.TestCase):
                 0.8292]
 
         structure = self.data_for_test2()
-        distances = xsp.radial_density_function.calc_distances_with_repetition(
+        distances = xsp.pdf.calc_distances_with_repetition(
                         structure, 1)
         
         expectedDistances.sort()

@@ -1,11 +1,11 @@
 import numpy as np
 
-"""Calculations pertaining to radial density function."""
+"""Calculations pertaining to pair density function."""
 
-def calc_rdf(structure):
-    return calc_rdf(structure, 0)
+def calc_pdf(structure):
+    return calc_pdf(structure, 0)
 
-def calc_rdf(structure, maxOffset):
+def calc_pdf(structure, maxOffset):
     distances = calc_distances_with_repetition(structure, maxOffset)
     nBins = 50
     lowerBnd = round(min(distances), 2)
