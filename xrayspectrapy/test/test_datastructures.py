@@ -11,5 +11,11 @@ class StructureTests(unittest.TestCase):
         s = xsp.Structure([xsp.Atom(5, 8, 9), xsp.Atom(5, 2, 0)])
         self.assertEqual(str(s), '[(5, 8, 9)(5, 2, 0)]')
 
+class ImageTests(unittest.TestCase):
+    def test_str(self):
+        x = xsp.Image([0.24, 0.28, 0.32, 0.36], [.0001, 0.50, 0.449, 0.1112])
+        self.assertEqual(str(x),
+                'Image: \n0.24\t0.0001\n0.28\t0.5\n0.32\t0.449\n0.36\t0.1112')
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,3 +1,4 @@
 from xrayspectrapy.datadefs.atom import Atom
 from xrayspectrapy.datadefs.structure import Structure
+from xrayspectrapy.datadefs.image import Image
 from xrayspectrapy import pdf

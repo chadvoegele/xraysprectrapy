@@ -1,19 +1,31 @@
 import unittest
 import xrayspectrapy as xsp
 
-class RadialDensityFunctionTests(unittest.TestCase):
+class PairDistFunctionTests(unittest.TestCase):
     def data_for_test1(self):
         return xsp.Structure([xsp.Atom(1.2455, 0.5367, -0.0729),
-                          xsp.Atom(0.9239, -0.9952, 0.0237),
-                          xsp.Atom(-0.1226, -0.7041, 1.1548)])
+                              xsp.Atom(0.9239, -0.9952, 0.0237),
+                              xsp.Atom(-0.1226, -0.7041, 1.1548)])
 
     def data_for_test2(self):
         return xsp.Structure([xsp.Atom(0.375, 0.375, 0.375),
-                          xsp.Atom(0.125, 0.125, 0.625),
-                          xsp.Atom(0.375, 0.875, 0.875)])
+                              xsp.Atom(0.125, 0.125, 0.625),
+                              xsp.Atom(0.375, 0.875, 0.875)])
+
+    def data_for_si_mp149(self):
+        """Data from https://materialsproject.org/materials/mp-149/"""
+        return xsp.Structure([xsp.Atom(0.375,0.375,0.375),
+                              xsp.Atom(0.125,0.125,0.625),
+                              xsp.Atom(0.375,0.875,0.875),
+                              xsp.Atom(0.125,0.625,0.125),
+                              xsp.Atom(0.875,0.375,0.875),
+                              xsp.Atom(0.625,0.125,0.125),
+                              xsp.Atom(0.875,0.875,0.375),
+                              xsp.Atom(0.625,0.625,0.625)])
 
     def test_pairwise_distances(self):
-        expectedDistances = [1.5683, 2.2178, 1.5683, 1.5682, 2.2178, 1.5682]
+        expectedDistances = [0, 1.5683, 2.2178, 1.5683, 0, 1.5682,\
+                2.2178, 1.5682, 0]
         structure = self.data_for_test1()
         distances = xsp.pdf.calc_distances(structure)
         
@@ -80,6 +92,50 @@ class RadialDensityFunctionTests(unittest.TestCase):
         for i in range(0, len(expectedDistances)):
             self.assertAlmostEqual(expectedDistances[i], distances[i], 4)
 
+    def test_si_mp146_pdf(self):
+        structure = self.data_for_si_mp149()
+        pdf = xsp.pdf.calc_pdf(structure, 1)
+        expectedDistances = [0.41875, 0.4375, 0.45625, 0.475, 0.49375, 0.5125,
+                0.53125, 0.55, 0.56875, 0.5875, 0.60625, 0.625, 0.64375, 0.6625,
+                0.68125, 0.7, 0.71875, 0.7375, 0.75625, 0.775, 0.79375, 0.8125,
+                0.83125, 0.85, 0.86875, 0.8875, 0.90625, 0.925, 0.94375, 0.9625,
+                0.98125, 1, 1.01875, 1.0375, 1.05625, 1.075, 1.09375, 1.1125,
+                1.13125, 1.15, 1.16875, 1.1875, 1.20625, 1.225, 1.24375, 1.2625,
+                1.28125, 1.3, 1.31875, 1.3375, 1.35625, 1.375, 1.39375, 1.4125,
+                1.43125, 1.45, 1.46875, 1.4875, 1.50625, 1.525, 1.54375, 1.5625,
+                1.58125, 1.6, 1.61875, 1.6375, 1.65625, 1.675, 1.69375, 1.7125,
+                1.73125, 1.75, 1.76875, 1.7875, 1.80625, 1.825, 1.84375, 1.8625,
+                1.88125, 1.9, 1.91875, 1.9375, 1.95625, 1.975, 1.99375, 2.0125,
+                2.03125, 2.05, 2.06875, 2.0875, 2.10625, 2.125, 2.14375, 2.1625,
+                2.18125, 2.2, 2.21875, 2.2375, 2.25625, 2.275, 2.29375, 2.3125,
+                2.33125, 2.35, 2.36875, 2.3875, 2.40625, 2.425, 2.44375, 2.4625,
+                2.48125, 2.5, 2.51875, 2.5375, 2.55625, 2.575, 2.59375, 2.6125,
+                2.63125, 2.65, 2.66875, 2.6875, 2.70625, 2.725, 2.74375, 2.7625,
+                2.78125, 2.8]
+        expectedCounts = [0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 432,
+                0, 0, 0, 0, 0, 366, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 264,
+                0, 0, 0, 0, 0, 0, 432, 0, 0, 0, 284, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                312, 0, 0, 0, 0, 288, 0, 0, 0, 114, 0, 0, 0, 0, 0, 0, 168, 0, 0,
+                0, 0, 288, 0, 0, 174, 0, 0, 0, 0, 0, 36, 0, 0, 0, 48, 0, 0, 74,
+                0, 0, 0, 0, 0, 48, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0,
+                0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0]
+
+        for i in range(0, len(expectedDistances)):
+            self.assertAlmostEqual(expectedDistances[i], pdf.distances[i], 5)
+            self.assertAlmostEqual(expectedCounts[i], pdf.frequencies[i], 0)
+
+    def test_si_mp146_pdf_bins(self):
+        structure = self.data_for_si_mp149()
+        bins = [0.4, 0.64, 0.88, 1.12, 1.36, 1.6, 1.84, 2.08, 2.32, 2.56, 2.8]
+        pdf = xsp.pdf.calc_pdf(structure, 1, bins)
+
+        expectedDistances = [0.64, 0.88, 1.12, 1.36, 1.6, 1.84, 2.08, 2.32,
+                2.56, 2.8]
+        expectedCounts = [172, 798, 264, 716, 600, 282, 498, 170, 72, 12]
+
+        for i in range(0, len(expectedDistances)):
+            self.assertAlmostEqual(expectedDistances[i], pdf.distances[i], 2)
+            self.assertAlmostEqual(expectedCounts[i], pdf.frequencies[i], 0)
 
 if __name__ == '__main__':
     unittest.main()
