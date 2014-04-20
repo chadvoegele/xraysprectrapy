@@ -1,9 +1,33 @@
+import math
 import numpy as np
 import xrayspectrapy as xsp
 
 """Calculations pertaining to pair distribution function."""
 
-def calc_pdf(structure, maxOffset = 0, binsOrnBins = 128):
+def smooth_image(image, t):
+    """Smoothes the image using a gaussian blur according to the smoothing
+       constant t."""
+    return xsp.Image(image.distances, 
+             gaussian_blur(image.distances, image.frequencies, t))
+
+def gaussian_blur(xs, ys, t):
+    """For two vectors, xs and ys, and a smoothing constant,t, gaussian_blur
+       calculates the weierstrass transform of the function xs -> ys."""
+    if len(xs) != len(ys):
+        raise ValueError("x and y must have the same number of elements")
+
+    def calc_weights(x, xs, t):
+        return [math.exp(-(x-a)*(x-a)/4/t) for a in xs]
+
+    def calc_smoothed_y(x, xs, ys, t):
+        weights = calc_weights(x, xs, t)
+        sum_weights = sum(weights)
+
+        return sum((w*y for (w,y) in zip(weights, ys)))/sum_weights
+
+    return [calc_smoothed_y(x, xs, ys, t) for x in xs]
+
+def calc_pdf(structure, maxDist = 0, binsOrnBins = 128):
     """Calculates the pair distribution function for structure.
 
        Arguments: structure -- xrayspectrapy.structure.Structure
@@ -13,7 +37,7 @@ def calc_pdf(structure, maxOffset = 0, binsOrnBins = 128):
        Example: calc_pdf(structure, 1, [0 0.2 0.4 0.6 0.8 1])
                 calc_pdf(structure, 1, 5)
     """
-    distances = calc_distances_with_repetition(structure, maxOffset)
+    distances = calc_distances_with_repetition(structure, maxDist)
 
     if isinstance(binsOrnBins, int):
         nBins = binsOrnBins
@@ -34,20 +58,10 @@ def calc_bins(lowerBnd, upperBnd, nBins):
     increment = (upperBnd - lowerBnd) / nBins
     return [x * increment + lowerBnd for x in range(0, nBins + 1)]
 
-def calc_distances(structure):
-    """Calculate all pairwise distances for atoms in structure.
-    
-       Arguments:
-       structure -- xrayspectrapy.structure.Structure
-       maxOffset -- int
-    """
-    zeroOffset = np.array((0, 0, 0))
-    return calc_offset_distances(structure, zeroOffset, zeroOffset)
-
-def calc_distances_with_repetition(structure, nPeriods, wantLabels = False):
-    """Calculates pairwise distances where structure is repeated nPeriods times
-        in all directions. This only works if coordinates of the structures are
-        periodic with a distance of periodLength in all directions.
+def calc_distances_with_repetition(structure, maxDist, wantLabels = False):
+    """Calculates all pairwise distances up to maxDist between atoms in
+       structure where the atoms can be displaced according to a periodicity of 1
+       in all directions.
 
        In 2D for nPeriods = 1,
           --------------------------
@@ -57,34 +71,34 @@ def calc_distances_with_repetition(structure, nPeriods, wantLabels = False):
        (-1,0)----(0,0)----(1,0)-----
           |        |        |      |
        (-1,-1)---(0,-1)---(1,-1)----
+       """
 
-       Arguments:
-       structure -- XRaySpectraLib.structure.Structure
-       maxOffset -- int
-    """
-    allCoords = [x for atom in structure.atoms 
-                    for x in [atom.x, atom.y, atom.z]]
-    if (not (min(allCoords) >= 0 and max(allCoords) <= 1)):
-        raise Exception('min coord must not be less than 0 and max coord must' +
-                           ' not be more than 1')
-
-    ind = range(-nPeriods, nPeriods + 1)  # [-nPeriods, nPeriods]
-    offsets = [np.array((i, j, k)) for i in ind for j in ind for k in ind]
-    pairOffsets = [(x, y) for x in offsets for y in offsets]
-    
-    return [d for (o1, o2) in pairOffsets
-              for d in calc_offset_distances(structure, o1, o2, wantLabels)]
-
-def calc_offset_distances(structure, offset1, offset2, wantLabels = False):
-    """Calculates all pairwise distances for atoms in structure where one of the
-        atoms has been displaced by offset1 and the other by offset2.
-       For all i, j where i != j, dist(atom_i + offset1, atom_j + offset2)
-    """
     atoms = structure.atoms
-    nAtoms = len(atoms)
-    pairIndices = [(i,j) for i in range(0, nAtoms) for j in range(0, nAtoms)]
-    return [calc_distance(atoms[i], atoms[j], offset1, offset2, wantLabels)
-            for (i, j) in pairIndices]
+    distances = [x for atom in atoms for oAtom in atoms
+                 for x in calc_close_distances(atom, oAtom, maxDist, wantLabels)]
+    return distances
+
+def calc_close_distances(thisAtom, otherAtom, maxDist, wantLabels = False):
+    """Calculates distances up to maxDist from thisAtom to otherAtom where
+       otherAtom is displaced according to a periodicity of 1 in all direction."""
+    maxPossibleOffset = math.ceil(maxDist) + 1
+    r = range(-maxPossibleOffset, maxPossibleOffset + 1)
+    offsets = [np.array((i,j,k)) for i in r for j in r for k in r]
+
+    zeroOffset = np.array((0,0,0))
+    distances = (calc_distance(thisAtom, otherAtom, zeroOffset, o, wantLabels)
+                    for o in offsets)
+    if wantLabels:
+        return [d for d in distances if d.distance <= maxDist if d.distance > 0]
+    else:
+        return [d for d in distances if d <= maxDist if d > 0]
+
+def calc_distances(structure, wantLabels = False):
+    """Calculates all pairwise distances between atoms in structure."""
+    atoms = structure.atoms
+    zero = np.array((0,0,0))
+    return [calc_distance(atom, oAtom, zero, zero, wantLabels) 
+             for atom in atoms for oAtom in atoms]
 
 def calc_distance(atom1, atom2, offset1, offset2, wantLabels = False):
     """Calculates distance between atom1 and atom2 where atom1 is offset by
