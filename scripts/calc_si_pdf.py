@@ -23,4 +23,12 @@ freq_sum = sum(pdf.frequencies)
 pdf.frequencies = [a / freq_sum for a in pdf.frequencies]
 pdf.distances = [a * c for a in pdf.distances]
 
-print(pdf)
+
+actualFilename = os.path.expanduser('~/work/rfdata/Calc10001.txt')
+actual_calc_pdf = xsp.datadefs.image.fromFile(actualFilename)
+actual_calc_pdf = xsp.pdf.smooth_image(actual_calc_pdf, 0.005)
+
+exptFilename = os.path.expanduser('~/work/rfdata/Expt1.txt')
+expt_pdf = xsp.datadefs.image.fromFile(exptFilename)
+
+print(actual_calc_pdf)

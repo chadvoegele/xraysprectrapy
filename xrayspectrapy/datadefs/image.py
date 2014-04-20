@@ -1,3 +1,5 @@
+import numpy as np
+
 """Holds x-ray scattering image data"""
 class Image:
     def __init__(self, distances, frequencies):
@@ -12,4 +14,9 @@ class Image:
             out_str = out_str + '\n'
             out_str = out_str + str(pair[0]) + '\t' + str(pair[1])
         return out_str
+
+def fromFile(filename, sep = ","):
+    fileContents = np.loadtxt(filename)
+    return Image([x[0] for x in fileContents],
+            [x[1] for x in fileContents])
 

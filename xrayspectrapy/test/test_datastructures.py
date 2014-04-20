@@ -17,5 +17,17 @@ class ImageTests(unittest.TestCase):
         self.assertEqual(str(x),
                 'Image: \n0.24\t0.0001\n0.28\t0.5\n0.32\t0.449\n0.36\t0.1112')
 
+    def test_from_file(self):
+        expectedDists = [1.92, 1.96, 2.00, 2.04]
+        expectedFrequencies = [0.0005, 0.0010, 0.0015, 0.0205]
+        im = xsp.datadefs.image.fromFile("xrayspectrapy/test/test_image.txt")
+
+        for i in range(0,len(expectedDists)):
+            self.assertAlmostEqual(expectedDists[i], im.distances[i], 2)
+
+        for i in range(0,len(expectedFrequencies)):
+            self.assertAlmostEqual(expectedFrequencies[i], im.frequencies[i], 4)
+
+
 if __name__ == '__main__':
     unittest.main()
