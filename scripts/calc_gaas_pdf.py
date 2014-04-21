@@ -3,6 +3,7 @@ parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parentdir)
 
 import xrayspectrapy as xsp
+from scipy import interpolate
 
 s = xsp.Structure([xsp.Atom(0.00,0.00,0.00,"Ga1"),
                     xsp.Atom(0.00,0.50,0.50,"Ga2"),
@@ -21,10 +22,18 @@ c = 5.6536998749
 
 
 bins = xsp.pdf.calc_bins(1, 10, 200)
-bins = [b / c for b in bins]
-im = xsp.pdf.calc_pdf(s, 10/c, bins)
+binsbyc = [b / c for b in bins]
+im = xsp.pdf.calc_pdf(s, 10/c, binsbyc)
 sf = sum(im.frequencies)
 im = xsp.Image([d * c for d in im.distances], 
         [f / sf for f in im.frequencies])
 im = xsp.pdf.smooth_image(im, 0.005)
-print(im)
+# print(im)
+
+expt_filename = os.path.expanduser('~/work/gaas_fig4.csv')
+im = xsp.datadefs.image.fromFile(expt_filename)
+f = interpolate.interp1d(im.distances, im.frequencies, kind = 'cubic')
+freqnew = [f(y) for y in bins[2:(len(bins)-1)]]
+imnew = xsp.Image(bins[2:(len(bins)-1)], freqnew)
+# print(im)
+print(imnew)

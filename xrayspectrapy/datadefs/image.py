@@ -15,7 +15,7 @@ class Image:
             out_str = out_str + str(pair[0]) + '\t' + str(pair[1])
         return out_str
 
-def fromFile(filename, sep = ","):
+def fromFile(filename):
     fileContents = np.loadtxt(filename)
     return Image([x[0] for x in fileContents],
             [x[1] for x in fileContents])

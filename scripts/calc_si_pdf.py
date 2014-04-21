@@ -22,13 +22,20 @@ pdf = xsp.pdf.calc_pdf(s, 10/c, [a / c for a in bins])
 freq_sum = sum(pdf.frequencies)
 pdf.frequencies = [a / freq_sum for a in pdf.frequencies]
 pdf.distances = [a * c for a in pdf.distances]
-
+my_calc_pdf = xsp.pdf.smooth_image(pdf, 0.004)
 
 actualFilename = os.path.expanduser('~/work/rfdata/Calc10001.txt')
 actual_calc_pdf = xsp.datadefs.image.fromFile(actualFilename)
-actual_calc_pdf = xsp.pdf.smooth_image(actual_calc_pdf, 0.005)
+actual_calc_pdf = xsp.pdf.smooth_image(actual_calc_pdf, 0.004)
 
 exptFilename = os.path.expanduser('~/work/rfdata/Expt1.txt')
 expt_pdf = xsp.datadefs.image.fromFile(exptFilename)
 
-print(actual_calc_pdf)
+#gaussian smoothing calibration
+#ts = [x*0.0001 for x in range(25, 50)]
+#errors = [xsp.comparers.least_squares(
+#            xsp.pdf.smooth_image(actual_calc_pdf, t), expt_pdf)
+#        for t in ts]
+#print("\n".join([str(t) + '\t' + str(error) for (t, error) in zip(ts, errors)]))
+
+print(my_calc_pdf)
