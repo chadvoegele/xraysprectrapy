@@ -37,7 +37,10 @@ def calc_pdf(structure, maxDist = 0, binsOrnBins = 128):
        Example: calc_pdf(structure, 1, [0 0.2 0.4 0.6 0.8 1])
                 calc_pdf(structure, 1, 5)
     """
-    distances = calc_distances_with_repetition(structure, maxDist)
+    if (structure.period_length != None):
+        distances = calc_distances_with_repetition(structure, maxDist)
+    else:
+        distances = calc_distances(structure)
 
     if isinstance(binsOrnBins, int):
         nBins = binsOrnBins
@@ -46,7 +49,11 @@ def calc_pdf(structure, maxDist = 0, binsOrnBins = 128):
         bins = binsOrnBins
 
     (frequencies, _) = np.histogram(distances, bins)
-    return xsp.Image(bins[:-1], frequencies)
+    outDistances = bins[:-1]
+    frequencies = [f / d / d for (f, d) in zip(frequencies, outDistances)]
+    sumFrequencies = sum(frequencies)
+    frequencies = [f / sumFrequencies for f in frequencies]
+    return xsp.Image(outDistances, frequencies)
 
 def calc_bins(lowerBnd, upperBnd, nBins):
     """Returns nBins number of intervals equally spaced between lowerBnd and
@@ -74,16 +81,19 @@ def calc_distances_with_repetition(structure, maxDist, wantLabels = False):
        """
 
     atoms = structure.atoms
-    distances = [x for atom in atoms for oAtom in atoms
-                 for x in calc_close_distances(atom, oAtom, maxDist, wantLabels)]
+    period = structure.period_length
+    def dist(atom, oAtom): 
+        return calc_close_distances(atom, oAtom, period, maxDist, wantLabels)
+    distances = [x for atom in atoms for oAtom in atoms for x in dist(atom, oAtom)]
     return distances
 
-def calc_close_distances(thisAtom, otherAtom, maxDist, wantLabels = False):
+def calc_close_distances(thisAtom, otherAtom, period, maxDist, wantLabels=False):
     """Calculates distances up to maxDist from thisAtom to otherAtom where
-       otherAtom is displaced according to a periodicity of 1 in all direction."""
-    maxPossibleOffset = math.ceil(maxDist) + 1
+       otherAtom is displaced according to a periodicity of period in all 
+       directions."""
+    maxPossibleOffset = math.ceil(maxDist/period) + 1
     r = range(-maxPossibleOffset, maxPossibleOffset + 1)
-    offsets = [np.array((i,j,k)) for i in r for j in r for k in r]
+    offsets = [period * np.array((i,j,k)) for i in r for j in r for k in r]
 
     zeroOffset = np.array((0,0,0))
     distances = (calc_distance(thisAtom, otherAtom, zeroOffset, o, wantLabels)
