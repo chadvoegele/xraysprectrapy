@@ -24,6 +24,7 @@
 \def \fullline {\vspace{.2em}\hrule\vspace{3px}}
 
 \begin{document}
+\tableofcontents
 \setlength{\parindent}{0.25in}
 \setlength{\floatsep}{0in}
 \section{Radial Density Function}
@@ -50,6 +51,18 @@ Suppose $D$ is a random variable that samples at random the distances, $d$, in
 the chemical structure. The radial density function is the probability density
 function of this random variable. This function can be estimated empirically via
 a histogram.
+
+The histogram is then normalized by the volume a spherical shell.
+\begin{align*}
+  \frac{4}{3} &\pi (r + \Delta r)^3 - \frac{4}{3} \pi r^3\\
+     &=\frac{4}{3} (3 r^2 \Delta r + 3 r (\Delta r)^2 + (\Delta r)^3) \\
+              &\approx 4 \pi r^2 \Delta r
+\end{align*}
+where $\Delta r$ tends to zero.
+
+For a histogram with frequency, $f$, for bin $[d_i, d_{i+1}]$, we replace $f$
+with $f / d_i^2$. And then normalize the histogram so that the sum over all bins
+is one.
 
 \subsection{Adding Noise For Atom Vibration}
 Due to the vibrations of the molecules, the radial density function will not be
@@ -97,27 +110,74 @@ H,-2.2430,-0.9665, 0.1313
 H,-0.3583,-1.4906,-1.9058
 \end{verbatim}
 
-\noindent Radial Density Functions
-\begin{figure}
+\subsubsection{Cubane Radial Density Functions}
+\begin{figure}[h!]
   \begin{center}
     \includegraphics[scale=0.7]{figs/cubane_rdf_before_smoothing.png}
     \caption{Before Smoothing}
   \end{center}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[h!]
   \begin{center}
     \includegraphics[scale=0.7]{figs/cubane_rdf_after_smoothing.png}
     \caption{After Smoothing}
   \end{center}
 \end{figure}
+\clearpage
+
+\subsection{Experimental and Theoretical RDFs for Known Structures}
+For some structures, we are able to theoretically calculate the RDF from atom
+locations and also have the experimental RDF from Xray scattering. These known
+matches provide some insight into understanding how the experiments and theory
+align. The RDF comparison are shown below.
+
+Outside of these structures, there are not many other known matches. There are a
+few reasons for this. First, if a structures is already known at the atomic
+level then there is no need to run an xray diffraction experiment. Second, if a
+structure is periodic as in a lattice, the atomic structure can be determined by
+xray diffraction which is easier and cheaper than xray scattering.
+
+\subsubsection{Ga As}
+\noindent Experimental Data: Pair Distribution Functions Analysis, Valeri
+Petkov\\
+\noindent Calculated Data: Maria Chan\\
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/gaas_rdf_comparison.png}
+    \caption{Ga As}
+  \end{center}
+\end{figure}
+
+\subsubsection{In As}
+\noindent Experimental Data: Pair Distribution Functions Analysis, Valeri
+Petkov\\
+\noindent Calculated Data: Maria Chan\\
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/inas_rdf_comparison.png}
+    \caption{In As}
+  \end{center}
+\end{figure}
+
+\subsubsection{Si Lattice}
+\noindent Experimental Data: J. AM. CHEM. SOC. VOL. 133, NO. 3, 2011, P:
+503-512\\
+\noindent Calculated Data: http://materialsproject.org/materials/mp-149/ \\
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/si_lattice_comparison.png}
+    \caption{Si Lattice}
+  \end{center}
+\end{figure}
 
 \pagebreak
 
-\noindent \textbf{Sources}
+\section{Sources}
 \begin{verbatim}
 http://en.wikipedia.org/wiki/Atom_vibrations
 http://en.wikipedia.org/wiki/Radial_distribution_function
+http://en.wikipedia.org/wiki/Weierstrass_transform
 \end{verbatim}
 
 %\pagebreak
