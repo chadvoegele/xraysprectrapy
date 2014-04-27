@@ -22,15 +22,18 @@ s = xsp.Structure([xsp.Atom(c*x, c*y, c*z, l) for (x,y,z,l) in atom_data], c)
 #    for d in distancesWLabels]
 #print("\n".join([str(x) for x in distancesWLabels]))
 
-bins = xsp.pdf.calc_bins(1, 10, 200)
+bins = xsp.pdf.calc_bins(1.92, 7.04, 128)
 im = xsp.pdf.calc_pdf(s, 10, bins)
 im = xsp.pdf.smooth_image(im, 0.005)
-print(im)
+# print(im)
 
 expt_filename = os.path.expanduser('~/work/gaas_fig4.csv')
 im = xsp.datadefs.image.fromFile(expt_filename)
 f = interpolate.interp1d(im.distances, im.frequencies, kind = 'cubic')
-freqnew = [f(y) for y in bins[2:(len(bins)-1)]]
-imnew = xsp.Image(bins[2:(len(bins)-1)], freqnew)
-# print(im)
-# print(im)
+freq = [f(y) for y in bins[:-1]]
+minfreq = min(freq)
+freq = [y - minfreq for y in freq]
+sumfreq = sum(freq)
+freq = [y/sumfreq for y in freq]
+im = xsp.Image(bins[:-1], freq)
+print(im)
