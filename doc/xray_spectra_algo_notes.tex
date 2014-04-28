@@ -111,14 +111,14 @@ H,-0.3583,-1.4906,-1.9058
 \end{verbatim}
 
 \subsubsection{Cubane Radial Density Functions}
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \begin{center}
     \includegraphics[scale=0.7]{figs/cubane_rdf_before_smoothing.png}
     \caption{Before Smoothing}
   \end{center}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
   \begin{center}
     \includegraphics[scale=0.7]{figs/cubane_rdf_after_smoothing.png}
     \caption{After Smoothing}
@@ -142,7 +142,7 @@ xray diffraction which is easier and cheaper than xray scattering.
 \noindent Experimental Data: Pair Distribution Functions Analysis, Valeri
 Petkov\\
 \noindent Calculated Data: Maria Chan\\
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.7]{figs/gaas_rdf_comparison.png}
     \caption{Ga As}
@@ -153,7 +153,7 @@ Petkov\\
 \noindent Experimental Data: Pair Distribution Functions Analysis, Valeri
 Petkov\\
 \noindent Calculated Data: Maria Chan\\
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.7]{figs/inas_rdf_comparison.png}
     \caption{In As}
@@ -164,7 +164,7 @@ Petkov\\
 \noindent Experimental Data: J. AM. CHEM. SOC. VOL. 133, NO. 3, 2011, P:
 503-512\\
 \noindent Calculated Data: http://materialsproject.org/materials/mp-149/ \\
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.7]{figs/si_lattice_comparison.png}
     \caption{Si Lattice}
@@ -173,11 +173,96 @@ Petkov\\
 
 \pagebreak
 
+\section{Principal Component Analysis}
+\subsection{Data Set}
+For the analysis following, a data set of radial density functions was used that
+contained 3,491 theoretical SiLi structures, 8 experimental SiLi structures, a
+pair of theoretical and calculated GaAs structures, and a pair of theoretical and
+calculated InAs structures. Each image had 128 evenly distances from 1.92 to
+7 angstroms.
+
+\subsection{Dimensionality}
+To discover the minimal dimensionality of the RDF data, I charted the cumulative
+proportion of variance explained by adding successive principal components. We
+can see from Figure $\ref{f:pca_dim}$ that around 30 principal components explain
+99\% of the variance. 
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_proportion_variance.png}
+    \caption{Proportion of Variance Explained\label{f:pca_dim}}
+  \end{center}
+\end{figure}
+
+\subsection{Basis Vectors}
+Sometimes PCA analysis gives intelligible basis vectors that identify a key
+characteristic in the data set. In the case of the RDF images, the basis vectors
+appear to be nonsensical. The first four principal component basis vectors are
+show in Figure $\ref{f:pca_basis}$.
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_basis_vectors.png}
+    \caption{PCA Basis Vectors\label{f:pca_basis}}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Projected RDFs}
+To further assess the capacity of PCA to reduce the dimensionality of the data,
+I sampled a few images and projected them onto PCA space with decreasing
+dimensions.
+
+\subsubsection{SiLi Calc10136}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_proj_sili_calc10136.png}
+    \caption{SiLi Calc10136 Projections}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{SiLi Expt1}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_proj_sili_expt1.png}
+    \caption{SiLi Expt1 Projections}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{SiLi Expt8}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_proj_sili_expt8.png}
+    \caption{SiLi Expt8 Projections}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{GaAs Expt}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/pca_proj_gaas_expt.png}
+    \caption{GaAs Expt Projections}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Observations}
+From the proportion of variance explained and the selected projections, clearly
+thirty principal components are sufficient to capture the essence of the image.
+Also, it shows that one principal component is not sufficient in most cases. It
+is strange however that the first principal component captures so clearly
+SiLi Calc10136. Further investigation is needed to determine whether this is due
+the large number of images similar to Calc10136 in the data set.
+
 \section{Sources}
 \begin{verbatim}
 http://en.wikipedia.org/wiki/Atom_vibrations
 http://en.wikipedia.org/wiki/Radial_distribution_function
 http://en.wikipedia.org/wiki/Weierstrass_transform
+http://matplotlib.org/api/mlab_api.html
 \end{verbatim}
 
 %\pagebreak

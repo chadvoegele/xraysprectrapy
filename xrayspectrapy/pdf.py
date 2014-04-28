@@ -8,7 +8,8 @@ def smooth_image(image, t):
     """Smoothes the image using a gaussian blur according to the smoothing
        constant t."""
     return xsp.Image(image.distances, 
-             gaussian_blur(image.distances, image.frequencies, t))
+             gaussian_blur(image.distances, image.frequencies, t),
+             image.label)
 
 def gaussian_blur(xs, ys, t):
     """For two vectors, xs and ys, and a smoothing constant,t, gaussian_blur
