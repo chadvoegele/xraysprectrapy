@@ -30,3 +30,10 @@ def fromFile(filepath, labelPrefix = ''):
 def toFile(filename, image):
     data = [(d, f) for (d, f) in zip(image.distances, image.frequencies)]
     np.savetxt(filename, data, fmt='%.2f %.8f')
+
+def saveAsSpectrumImage(filename, image, height = 50, brighten = 25):
+    import skimage.io
+    repeated_freqs = np.array([image.frequencies]).repeat(height, axis=0)
+    img_obj = skimage.io.Image(repeated_freqs * brighten)
+    skimage.io.imsave(filename, img_obj)
+
