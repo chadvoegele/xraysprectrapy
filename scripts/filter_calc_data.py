@@ -17,7 +17,7 @@ def exportDists():
     for im1 in allCalcImagesSub:
         for im2 in allCalcImagesSub:
             if (im1.label < im2.label):
-                dist = xsp.comparers.least_squares(im1, im2)
+                dist = xsp.comparers.l2_norm(im1, im2)
                 print(im1.label + "," + im2.label + "," + "%.12f" %dist)
 
 # filter_calc_data.py > 'data.csv'

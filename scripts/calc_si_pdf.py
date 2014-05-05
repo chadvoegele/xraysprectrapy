@@ -33,7 +33,7 @@ expt_pdf = xsp.datadefs.image.fromFile(exptFilename)
 
 #gaussian smoothing calibration
 #ts = [x*0.0001 for x in range(25, 50)]
-#errors = [xsp.comparers.least_squares(
+#errors = [xsp.comparers.l2_norm(
 #            xsp.pdf.smooth_image(actual_calc_pdf, t), expt_pdf)
 #        for t in ts]
 #print("\n".join([str(t) + '\t' + str(error) for (t, error) in zip(ts, errors)]))

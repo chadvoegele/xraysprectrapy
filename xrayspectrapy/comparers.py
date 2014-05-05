@@ -1,6 +1,6 @@
 import math
 
-def least_squares(image1, image2):
+def l2_norm(image1, image2):
     # image frequencies should be the same length as the distances if they were
     # not modified after construction
     if len(image1.distances) != len(image2.distances):

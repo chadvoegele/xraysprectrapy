@@ -18,7 +18,7 @@ allCalcImages = [xsp.datadefs.image.fromFile(f) for f in allCalcFiles]
 
 labels = [im.label for im in allCalcImages]
 for exptImage in exptImages:
-    dists = [xsp.comparers.least_squares(exptImage, calcImg)
+    dists = [xsp.comparers.l2_norm(exptImage, calcImg)
                 for calcImg in allCalcImages]
     print(exptImage.label + "->" + labels[np.argmin(dists)])
 
