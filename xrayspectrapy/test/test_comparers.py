@@ -16,10 +16,6 @@ class ImageComprarerTests(unittest.TestCase):
         dist = xsp.comparers.l2_norm(im1, im2)
         self.assertAlmostEqual(1.0247, dist, 4)
 
-    def test_str(self):
-        a = xsp.Atom(5, 8, 9)
-        self.assertEqual(str(a), '(5, 8, 9)')
-
 if __name__ == '__main__':
     unittest.main()
 
