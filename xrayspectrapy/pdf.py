@@ -4,6 +4,13 @@ import xrayspectrapy as xsp
 
 """Calculations pertaining to pair distribution function."""
 
+def normalize_image(image):
+    minFreq = min(image.frequencies)
+    newFreq = [f - minFreq for f in image.frequencies]
+    sumFreq = sum(newFreq)
+    newFreq = [f / sumFreq for f in newFreq]
+    return xsp.Image(image.distances, newFreq, image.label)
+
 def smooth_image(image, t):
     """Smoothes the image using a gaussian blur according to the smoothing
        constant t."""

@@ -266,8 +266,7 @@ class PairDistFunctionTests(unittest.TestCase):
         for i in range(0, len(expectedFreqs)):
             self.assertAlmostEqual(expectedFreqs[i], pdf.frequencies[i], 5)
 
-
-    def test_gaussian_blur(self):
+    def image_test_data1(self):
         distances = [0.049, 0.098, 0.147, 0.196, 0.245, 0.294, 0.343, 0.392,
                 0.441, 0.49, 0.539, 0.588, 0.637, 0.686, 0.735, 0.784, 0.833,
                 0.882, 0.931, 0.98, 1.029, 1.078, 1.127, 1.176, 1.225, 1.274,
@@ -285,6 +284,10 @@ class PairDistFunctionTests(unittest.TestCase):
                 0, 0, 0, 0, 0, 24, 0, 0, 48, 0, 0, 0, 0, 0, 0, 8, 0, 24, 0, 0,
                 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0,
                 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8]
+        return (distances, frequencies)
+
+    def test_gaussian_blur(self):
+        (distances, frequencies) = self.image_test_data1()
         expectedFreqs = [0.00000, 0.00000, 0.00000, 0.00000, 0.00000,
                 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000, 0.00000,
                 0.00002, 0.00019, 0.00144, 0.00872, 0.04152, 0.15552, 0.45818,
@@ -305,6 +308,28 @@ class PairDistFunctionTests(unittest.TestCase):
 
         for i in range(0, len(expectedFreqs)):
             self.assertAlmostEqual(expectedFreqs[i], smoothedFrequencies[i], 4)
+
+    def image_test_data2(self):
+        distances = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8,
+                     8.5, 9, 9.5, 10 ]
+        frequencies = [-0.5, 0.5, 1, 0, 0, 0, 8.7, 10, 9.6, 4.5, 2.1, 0, -0.1,
+                       -0.2, 3.1, 5, 6.8, 10, 9]
+        return (distances, frequencies)
+
+    def test_normalize_image(self):
+        (distances, frequencies) = self.image_test_data2()
+        im = xsp.Image(distances, frequencies)
+        expectedFreqs = [ 0, 0.012658227848101, 0.018987341772152,
+                          0.006329113924051, 0.006329113924051, 0.006329113924051,
+                          0.116455696202532, 0.132911392405063, 0.127848101265823,
+                          0.063291139240506, 0.032911392405063, 0.006329113924051,
+                          0.005063291139241, 0.00379746835443 , 0.045569620253165,
+                          0.069620253164557, 0.092405063291139, 0.132911392405063,
+                          0.120253164556962]
+        normed_image = xsp.pdf.normalize_image(im)
+
+        for (expected, actual) in zip(expectedFreqs, normed_image.frequencies):
+            self.assertAlmostEqual(expected, actual, 4)
 
 if __name__ == '__main__':
     unittest.main()
