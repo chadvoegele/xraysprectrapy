@@ -307,7 +307,7 @@ class PairDistFunctionTests(unittest.TestCase):
         smoothedFrequencies = xsp.pdf.gaussian_blur(distances, frequencies, t)
 
         for i in range(0, len(expectedFreqs)):
-            self.assertAlmostEqual(expectedFreqs[i], smoothedFrequencies[i], 4)
+            self.assertAlmostEqual(expectedFreqs[i], smoothedFrequencies[i], 5)
 
     def image_test_data2(self):
         distances = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8,
@@ -329,7 +329,7 @@ class PairDistFunctionTests(unittest.TestCase):
         normed_image = xsp.pdf.normalize_image(im)
 
         for (expected, actual) in zip(expectedFreqs, normed_image.frequencies):
-            self.assertAlmostEqual(expected, actual, 4)
+            self.assertAlmostEqual(expected, actual, 15)
 
 if __name__ == '__main__':
     unittest.main()
