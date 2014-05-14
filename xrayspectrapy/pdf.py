@@ -2,9 +2,21 @@ import math
 import numpy as np
 import xrayspectrapy as xsp
 
-"""Calculations pertaining to pair distribution function."""
+"""Calculations pertaining to pair distribution functions.
+
+Manipulations of PDF Images
+---------------------------
+- `normalize_image` -- normalizes an image to be non-negative and sum to 1
+- `smooth_image` -- smoothes an image with a gaussian blur
+
+Atom locations to PDF Image
+---------------------------
+- `calc_pdf` -- calculates the pdf image from atom locations
+
+"""
 
 def normalize_image(image):
+    """Normalizes an image to be =>0 and sum to 1."""
     minFreq = min(image.frequencies)
     newFreq = [f - minFreq for f in image.frequencies]
     sumFreq = sum(newFreq)
