@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import xrayspectrapy as xsp
+import random
 
 """Calculations pertaining to pair distribution functions.
 
@@ -14,6 +15,32 @@ Atom locations to PDF Image
 - `calc_pdf` -- calculates the pdf image from atom locations
 
 """
+
+def rand_normal_peaks(image, peak_height_mean=0.004, peak_height_stdev=0.004, 
+                      peak_count_min=7, peak_count_max=14):
+    countPeaks = random.randint(peak_count_min, peak_count_max)
+    peaks = []
+    for i in range(0, countPeaks):
+        peakHeight = random.normalvariate(peak_height_mean, peak_height_stdev)
+        peakDistIndx = random.randrange(0, len(image.distances))
+        peakLocation = image.distances[peakDistIndx]
+        peaks.append([peakLocation, peakHeight])
+    return peaks
+
+def noisify_image(image, rand_peak_fn=rand_normal_peaks, smooth=0.004):
+    freqsAndNoise = rand_peak_fn(image) 
+    originalFreqs = [[d,f] for (d,f) in zip(image.distances, image.frequencies)]
+    freqsAndNoise.extend(originalFreqs)
+
+    newFreqs = []
+    for dist in image.distances:
+        newFreqs.append(sum([d[1] for d in freqsAndNoise if d[0]==dist]))
+
+    newIm = xsp.Image(image.distances, newFreqs)
+    newIm = xsp.pdf.smooth_image(newIm, smooth)
+    newIm = normalize_image(newIm)
+
+    return newIm
 
 def normalize_image(image):
     """Normalizes an image to be =>0 and sum to 1."""

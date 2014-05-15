@@ -331,5 +331,28 @@ class PairDistFunctionTests(unittest.TestCase):
         for (expected, actual) in zip(expectedFreqs, normed_image.frequencies):
             self.assertAlmostEqual(expected, actual, 15)
 
+    def test_nosifiy_image(self):
+        distances = [ 0.5, 1, 1.5, 2, 2.5, 3 ]
+        frequencies = [ 6, 12, 18, 0, 1, 0 ]
+        im = xsp.Image(distances, frequencies)
+
+        def noise_sample(image):
+            noise = [[0.5, 1],
+                     [1.5, 2],
+                     [3, 1]]
+            return noise
+
+        noiseIm = xsp.pdf.noisify_image(im, noise_sample, 0.0005)
+
+        expectedDistances = [ 0.5, 1, 1.5, 2, 2.5, 3 ]
+        expectedFreqs = [0.1707317073, 0.2926829268, 0.487804878, 0,
+                         0.0243902439, 0.0243902439]
+
+        for (expected, actual) in zip(expectedDistances, distances):
+            self.assertAlmostEqual(expected, actual, 15)
+
+        for (expected, actual) in zip(expectedFreqs, noiseIm.frequencies):
+            self.assertAlmostEqual(expected, actual, 10)
+
 if __name__ == '__main__':
     unittest.main()
