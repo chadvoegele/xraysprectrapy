@@ -70,7 +70,7 @@ def gaussian_blur(xs, ys, t):
         weights = calc_weights(x, xs, t)
         sum_weights = sum(weights)
 
-        return sum((w*y for (w,y) in zip(weights, ys)))/sum_weights
+        return np.dot(weights, ys)/sum_weights
 
     return [calc_smoothed_y(x, xs, ys, t) for x in xs]
 
