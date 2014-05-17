@@ -1,7 +1,3 @@
-import sys, os
-parentdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(parentdir)
-
 import xrayspectrapy as xsp
 
 atom_data = ((0.375,0.375,0.375,"Si1"),
