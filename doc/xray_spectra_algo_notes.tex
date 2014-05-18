@@ -280,12 +280,174 @@ the large number of images similar to Calc10136 in the data set.
 \end{figure}
 \clearpage
 
+\section{Recognition Using Eigenfaces}
+% experimental accuracy - by pca dim
+% synthetic accuracy - by pca dim
+\subsection{Mean Image}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/all_calc_images_mean.png}
+    \caption{All Calculated Images with Mean}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Variance Explained by Principal Components}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenfaces_varexplained.eps}
+    \caption{Cumulative Variance Explained by Principal Components}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Eigenfaces}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenfaces.eps}
+    \caption{Eigenface Images}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Data in Eigenspace}
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenspace1-2.eps}
+    \caption{Loading 1 vs  Loading 2}
+  \end{center}
+\end{figure}
+
+\begin{table}[ht]
+  \begin{center}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Label} & \textbf{Loading 1} & \textbf{Loading 2} \\ \hline
+    SiLiExpt1      & -0.0893            & 0.00982            \\ \hline
+    SiLiExpt2      & -0.0794            & -0.006             \\ \hline
+    SiLiExpt3      & -0.0616            & -0.0055            \\ \hline
+    SiLiExpt4      & -0.0522            & -0.0086            \\ \hline
+    SiLiExpt5      & -0.0356            & -0.0128            \\ \hline
+    ExptGaAs       & -0.0288            & 0.00994            \\ \hline
+    SiLiExpt7      & -0.0258            & -0.0101            \\ \hline
+    SiLiExpt6      & -0.0231            & -0.0051            \\ \hline
+    SiLiExpt8      & -0.0226            & -0.0111            \\ \hline
+    ExptInAs       & -0.0038            & -0.0044            \\ \hline
+  \end{tabular}
+  \caption{Experimental Data Sorted by Loading 1}
+  \end{center}
+\end{table}
+
+\begin{table}[h]
+  \begin{center}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Label} & \textbf{Loading 1} & \textbf{Loading 2} \\ \hline
+    SiLiExpt5      & -0.0356            & -0.0128            \\ \hline
+    SiLiExpt8      & -0.0226            & -0.0111            \\ \hline
+    SiLiExpt7      & -0.0258            & -0.0101            \\ \hline
+    SiLiExpt4      & -0.0522            & -0.0086            \\ \hline
+    SiLiExpt2      & -0.0794            & -0.006             \\ \hline
+    SiLiExpt3      & -0.0616            & -0.0055            \\ \hline
+    SiLiExpt6      & -0.0231            & -0.0051            \\ \hline
+    ExptInAs       & -0.0038            & -0.0044            \\ \hline
+    SiLiExpt1      & -0.0893            & 0.00982            \\ \hline
+    ExptGaAs       & -0.0288            & 0.00994            \\ \hline
+  \end{tabular}
+  \caption{Experimental Data Sorted by Loading 2}
+  \end{center}
+\end{table}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenspace2-3.eps}
+    \caption{Loading 2 vs  Loading 3}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenspace3-4.eps}
+    \caption{Loading 3 vs  Loading 4}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/eigenspace4-5.eps}
+    \caption{Loading 4 vs  Loading 5}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsection{Experimental Image Recognition}
+\begin{table}[h]
+  \begin{center}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Image}     & \textbf{Best Match} & \textbf{2}    & \textbf{3}    & \textbf{4}    & \textbf{5}    \\ \hline
+\textbf{ExptGaAs}  & SiLiCalc11436       & SiLiCalc11634 & SiLiCalc11967 & SiLiCalc12738 & SiLiCalc10225 \\ \hline
+\textbf{ExptInAs}  & SiLiCalc10643       & SiLiCalc10560 & SiLiCalc10693 & SiLiCalc10617 & SiLiCalc10621 \\ \hline
+\textbf{SiLiExpt1} & SiLiCalc10208       & SiLiCalc10315 & SiLiCalc10317 & SiLiCalc10188 & SiLiCalc10187 \\ \hline
+\textbf{SiLiExpt2} & SiLiCalc10317       & SiLiCalc10287 & SiLiCalc10320 & SiLiCalc10283 & SiLiCalc10273 \\ \hline
+\textbf{SiLiExpt3} & SiLiCalc10287       & SiLiCalc10239 & SiLiCalc10259 & SiLiCalc10317 & SiLiCalc10232 \\ \hline
+\textbf{SiLiExpt4} & SiLiCalc10229       & SiLiCalc10225 & SiLiCalc10232 & SiLiCalc10239 & SiLiCalc10259 \\ \hline
+\textbf{SiLiExpt5} & SiLiCalc10225       & SiLiCalc10256 & SiLiCalc10232 & SiLiCalc10229 & SiLiCalc10231 \\ \hline
+\textbf{SiLiExpt6} & SiLiCalc10322       & SiLiCalc10225 & SiLiCalc10247 & SiLiCalc10229 & SiLiCalc10256 \\ \hline
+\textbf{SiLiExpt7} & SiLiCalc10225       & SiLiCalc10322 & SiLiCalc10256 & SiLiCalc10247 & SiLiCalc10229 \\ \hline
+\textbf{SiLiExpt8} & SiLiCalc10225       & SiLiCalc10322 & SiLiCalc10247 & SiLiCalc10337 & SiLiCalc10256 \\ \hline
+\end{tabular}
+  \caption{Recognition with 3 Principal Components}
+  \end{center}
+\end{table}
+
+\begin{table}[h]
+  \begin{center}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Image}     & \textbf{Best Match} & \textbf{2}    & \textbf{3}             & \textbf{4}    & \textbf{5}    \\ \hline
+\textbf{ExptGaAs}  & \textbf{CalcGaAs}   & SiLiCalc10329 & SiLiCalc11337          & SiLiCalc11436 & SiLiCalc10571 \\ \hline
+\textbf{ExptInAs}  & SiLiCalc10646       & SiLiCalc10805 & SiLiCalc10792          & SiLiCalc10836 & SiLiCalc10767 \\ \hline
+\textbf{SiLiExpt1} & SiLiCalc10213       & SiLiCalc10215 & \textbf{SiLiCalc10001} & SiLiCalc10003 & SiLiCalc10313 \\ \hline
+\textbf{SiLiExpt2} & SiLiCalc10001       & SiLiCalc10003 & SiLiCalc10209          & SiLiCalc10317 & SiLiCalc10313 \\ \hline
+\textbf{SiLiExpt3} & SiLiCalc10257       & SiLiCalc10317 & SiLiCalc10259          & SiLiCalc10258 & SiLiCalc10256 \\ \hline
+\textbf{SiLiExpt4} & SiLiCalc10257       & SiLiCalc10258 & SiLiCalc10256          & SiLiCalc10229 & SiLiCalc10232 \\ \hline
+\textbf{SiLiExpt5} & SiLiCalc10445       & SiLiCalc10616 & SiLiCalc11436          & SiLiCalc10329 & SiLiCalc11337 \\ \hline
+\textbf{SiLiExpt6} & SiLiCalc10445       & SiLiCalc10616 & SiLiCalc11436          & SiLiCalc10693 & SiLiCalc11337 \\ \hline
+\textbf{SiLiExpt7} & SiLiCalc10445       & SiLiCalc10693 & SiLiCalc11337          & SiLiCalc10616 & SiLiCalc10482 \\ \hline
+\textbf{SiLiExpt8} & SiLiCalc10445       & SiLiCalc10693 & SiLiCalc10329          & SiLiCalc11337 & SiLiCalc10482 \\ \hline
+\end{tabular}
+  \caption{Recognition with 10 Principal Components}
+  \end{center}
+\end{table}
+
+\begin{table}[h]
+  \begin{center}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Image}     & \textbf{Best Match} & \textbf{2}    & \textbf{3}    & \textbf{4}             & \textbf{5}    \\ \hline
+\textbf{ExptGaAs}  & \textbf{CalcGaAs}   & SiLiCalc10445 & SiLiCalc11436 & SiLiCalc10693          & SiLiCalc11337 \\ \hline
+\textbf{ExptInAs}  & SiLiCalc10429       & SiLiCalc10838 & SiLiCalc10602 & SiLiCalc10836          & SiLiCalc10833 \\ \hline
+\textbf{SiLiExpt1} & SiLiCalc10194       & SiLiCalc10136 & SiLiCalc10147 & \textbf{SiLiCalc10001} & SiLiCalc10003 \\ \hline
+\textbf{SiLiExpt2} & SiLiCalc10001       & SiLiCalc10003 & SiLiCalc10136 & SiLiCalc10194          & SiLiCalc10147 \\ \hline
+\textbf{SiLiExpt3} & SiLiCalc10258       & SiLiCalc10229 & SiLiCalc10322 & SiLiCalc10245          & SiLiCalc11436 \\ \hline
+\textbf{SiLiExpt4} & SiLiCalc10258       & SiLiCalc10229 & SiLiCalc11436 & SiLiCalc10322          & SiLiCalc11337 \\ \hline
+\textbf{SiLiExpt5} & SiLiCalc10616       & SiLiCalc11337 & SiLiCalc10693 & SiLiCalc11436          & SiLiCalc11336 \\ \hline
+\textbf{SiLiExpt6} & SiLiCalc10616       & SiLiCalc10693 & SiLiCalc11337 & SiLiCalc11436          & SiLiCalc11336 \\ \hline
+\textbf{SiLiExpt7} & SiLiCalc10482       & SiLiCalc10616 & SiLiCalc10693 & SiLiCalc11337          & SiLiCalc10651 \\ \hline
+\textbf{SiLiExpt8} & SiLiCalc10482       & SiLiCalc10693 & SiLiCalc10616 & SiLiCalc10651          & SiLiCalc11337 \\ \hline
+\end{tabular}
+  \caption{Recognition with 20 Principal Components}
+  \end{center}
+\end{table}
+
 \section{Sources}
 \begin{verbatim}
 http://en.wikipedia.org/wiki/Atom_vibrations
 http://en.wikipedia.org/wiki/Radial_distribution_function
 http://en.wikipedia.org/wiki/Weierstrass_transform
 http://matplotlib.org/api/mlab_api.html
+http://en.wikipedia.org/wiki/Principal_components_analysis
 \end{verbatim}
 
 %\pagebreak
