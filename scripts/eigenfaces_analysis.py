@@ -81,7 +81,7 @@ def printAllCalcFreqs():
     print(matToStr(freqMatMean))
 
 def plotEigenSpaceScatter():
-    (_, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
+    (calcLabels, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
     T = np.dot(freqMat, V)
 
     (exptLabels, freqExpt) = getExptPCAData(mean)
@@ -93,10 +93,24 @@ def plotEigenSpaceScatter():
              (3,4))
     pairToStr = lambda x: (str(x[0]+1), str(x[1]+1))
 
+    exptCalcMatches = (('SiLiCalc10001', 'SiLiExpt1'),
+                     ('CalcGaAs', 'ExptGaAs'),
+                     ('CalcInAs', 'ExptInAs'))
+
     for pair in pairs:
         plt.plot(T[:,pair[0]], T[:,pair[1]], '.')
         plt.plot(TExp[:,pair[0]], TExp[:,pair[1]], '.r')
-        plt.legend(('Calc', 'Expt'))
+        legend=['Calc', 'Expt']
+
+        for (calcLabel, exptLabel) in exptCalcMatches:
+            calcIdx = calcLabels.index(calcLabel)
+            exptIdx = exptLabels.index(exptLabel)
+            plt.plot(T[calcIdx,pair[0]], T[calcIdx,pair[1]], 'o')
+            plt.plot(TExp[exptIdx,pair[0]], TExp[exptIdx,pair[1]], '*')
+            legend.append(calcLabel)
+            legend.append(exptLabel)
+        
+        plt.legend(legend, ncol=2, loc=4)
         plt.xlabel('Loading: '+ pairToStr(pair)[0])
         plt.ylabel('Loading: '+ pairToStr(pair)[1])
         directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
@@ -203,4 +217,5 @@ def getImage():
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 # getExptRecognitionAccuracy()
-getSynthExptRecognitionAnalysis(int(sys.argv[1]))
+# getSynthExptRecognitionAnalysis(int(sys.argv[1]))
+plotEigenSpaceScatter()
