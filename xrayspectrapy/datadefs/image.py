@@ -37,3 +37,20 @@ def saveAsSpectrumImage(filename, image, height = 50, brighten = 25):
     img_obj = skimage.io.Image(repeated_freqs * brighten)
     skimage.io.imsave(filename, img_obj)
 
+def saveAllAsLineImages(filename, images):
+    import matplotlib.pyplot as plt
+
+    for i in range(1, len(images)):
+        if (images[0].distances != images[i].distances):
+            raise ValueError('distances must be the same for all images')
+
+    for image in images:
+        plt.plot(image.distances, image.frequencies, '-')
+
+    legend = [im.label for im in images]
+    plt.legend(legend, ncol=2, numpoints=1)
+    plt.xlabel('Distances (Angstroms)')
+    plt.ylabel('Frequencies')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
+

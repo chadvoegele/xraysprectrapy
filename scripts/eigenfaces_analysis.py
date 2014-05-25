@@ -87,10 +87,10 @@ def plotEigenSpaceScatter():
     (exptLabels, freqExpt) = getExptPCAData(mean)
     TExp = np.dot(freqExpt, V)
 
-    pairs = ((0,1),
-             (1,2),
-             (2,3),
-             (3,4))
+    pairs = ((0,1,2),
+             (1,2,2),
+             (2,3,3),
+             (3,4,2))
     pairToStr = lambda x: (str(x[0]+1), str(x[1]+1))
 
     exptCalcMatches = (('SiLiCalc10001', 'SiLiExpt1'),
@@ -110,7 +110,7 @@ def plotEigenSpaceScatter():
             legend.append(calcLabel)
             legend.append(exptLabel)
         
-        plt.legend(legend, ncol=2, loc=4)
+        plt.legend(legend, ncol=2, loc=pair[2], numpoints=1)
         plt.xlabel('Loading: '+ pairToStr(pair)[0])
         plt.ylabel('Loading: '+ pairToStr(pair)[1])
         directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
@@ -167,6 +167,23 @@ def plotAllCalcFreqsWMean():
     plt.savefig(filename, dpi=250, bbox_inches='tight')
     plt.close()
 
+def plotBestMatches():
+    images = [getAllCalcImages(), getAllExptImages()]
+    images = [im for sublist in images for im in sublist]
+
+    allLabels = [['SiLiExpt1', 'SiLiCalc10001'],
+                 ['SiLiExpt5', 'SiLiCalc10225']]
+    
+    for labels in allLabels:
+        plotImages(labels, images)
+
+def plotImages(labels, images):
+    selectImages = [im for im in images if im.label in labels]
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    name = '-'.join(labels)
+    filename = os.path.join(directory, 'PCAMatch' + name + '.eps')
+    xsp.datadefs.image.saveAllAsLineImages(filename, selectImages)
+
 def getExptPCAData(means):
     exptImages = getAllExptImages()
     labels = [im.label for im in exptImages]
@@ -216,6 +233,5 @@ def getImage():
 
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
-# getExptRecognitionAccuracy()
 # getSynthExptRecognitionAnalysis(int(sys.argv[1]))
-plotEigenSpaceScatter()
+plotBestMatches()
