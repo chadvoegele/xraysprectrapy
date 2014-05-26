@@ -20,7 +20,7 @@ def main():
     print(matToStr(TExp[:,0:2]))
 
 def getExptRecognitionAccuracy():
-    nPCs = 20
+    nPCs = 128
 
     (labels, _, mean, freqMat, _, V) = getPCAData(getAllCalcImages())
     T = np.dot(freqMat, V)[:,0:nPCs]
@@ -135,17 +135,30 @@ def plotCumulativeVarExplained():
     plt.savefig(filename, bbox_inches='tight')
     plt.close()
 
-def plotEigenfaces():
-    (_, dists, _, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
+def plotEigenface(eigenIndex):
+    (_, dists, means, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
 
-    n = 8
+    eigenface = V[:,eigenIndex - 1]
+
+    allLocs = [3, 1, 4]
+
+    n = 5
+    maxLoad = 0.15
+    minLoad = -maxLoad
+    step = (maxLoad - minLoad) / (n - 1)
+
+    load = minLoad
+    legend = []
     for i in range(0,n):
-        plt.plot(dists, V[:,i], '-')
+        plt.plot(dists, eigenface * load + means, '-')
+        legend.append('Loading: ' + str(load))
+        load = load + step
 
-    plt.axis([1, 8, np.min(V[:,0:n])*0.9, np.max(V[:,0:n])*1.1])
     plt.ylabel('Frequencies')
     plt.xlabel('Distances (Angstroms)')
-    filename = os.path.expanduser('~/code/xrayspectrapy/doc/figs/eigenfaces.eps')
+    plt.legend(legend, loc=allLocs[eigenIndex - 1])
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(directory, 'eigenface' + str(eigenIndex) + '.eps')
     plt.savefig(filename, bbox_inches='tight')
     plt.close()
 
@@ -171,17 +184,91 @@ def plotBestMatches():
     images = [getAllCalcImages(), getAllExptImages()]
     images = [im for sublist in images for im in sublist]
 
-    allLabels = [['SiLiExpt1', 'SiLiCalc10001'],
-                 ['SiLiExpt5', 'SiLiCalc10225']]
+    best3PCMatches = [['ExptGaAs',  'SiLiCalc11436', 'SiLiCalc11634'],
+            ['ExptInAs',  'SiLiCalc10643', 'SiLiCalc10560'],
+            ['SiLiExpt1', 'SiLiCalc10208', 'SiLiCalc10315'],
+            ['SiLiExpt2', 'SiLiCalc10317', 'SiLiCalc10287'],
+            ['SiLiExpt3', 'SiLiCalc10287', 'SiLiCalc10239'],
+            ['SiLiExpt4', 'SiLiCalc10229', 'SiLiCalc10225'],
+            ['SiLiExpt5', 'SiLiCalc10225', 'SiLiCalc10256'],
+            ['SiLiExpt6', 'SiLiCalc10322', 'SiLiCalc10225'],
+            ['SiLiExpt7', 'SiLiCalc10225', 'SiLiCalc10322'],
+            ['SiLiExpt8', 'SiLiCalc10225', 'SiLiCalc10322']]
     
-    for labels in allLabels:
-        plotImages(labels, images)
+    for labels in best3PCMatches:
+        plotImages(labels, images, 'PC3Match')
 
-def plotImages(labels, images):
+    best10PCMatches = [['ExptGaAs', 'CalcGaAs', 'SiLiCalc10329'],
+            ['ExptInAs', 'SiLiCalc10646', 'SiLiCalc10805'],  
+            ['SiLiExpt1', 'SiLiCalc10213', 'SiLiCalc10215'],
+            ['SiLiExpt2', 'SiLiCalc10001', 'SiLiCalc10003'],
+            ['SiLiExpt3', 'SiLiCalc10257', 'SiLiCalc10317'],
+            ['SiLiExpt4', 'SiLiCalc10257', 'SiLiCalc10258'],
+            ['SiLiExpt5', 'SiLiCalc10445', 'SiLiCalc10616'],
+            ['SiLiExpt6', 'SiLiCalc10445', 'SiLiCalc10616'],
+            ['SiLiExpt7', 'SiLiCalc10445', 'SiLiCalc10693'],
+            ['SiLiExpt8', 'SiLiCalc10445', 'SiLiCalc10693']]
+
+    for labels in best10PCMatches:
+        plotImages(labels, images, 'PC10Match')
+
+    best128PCMatches = [['ExptGaAs', 'CalcGaAs', 'SiLiCalc10445'],
+            ['ExptInAs', 'SiLiCalc10429', 'SiLiCalc10602'],
+            ['SiLiExpt1', 'SiLiCalc10194', 'SiLiCalc10001'],
+            ['SiLiExpt2', 'SiLiCalc10001', 'SiLiCalc10003'],
+            ['SiLiExpt3', 'SiLiCalc10258', 'SiLiCalc10229'],
+            ['SiLiExpt4', 'SiLiCalc10258', 'SiLiCalc11436'],
+            ['SiLiExpt5', 'SiLiCalc10616', 'SiLiCalc11337'],
+            ['SiLiExpt6', 'SiLiCalc10616', 'SiLiCalc10693'],
+            ['SiLiExpt7', 'SiLiCalc10693', 'SiLiCalc11337'],
+            ['SiLiExpt8', 'SiLiCalc10693', 'SiLiCalc10651']]
+
+    for labels in best128PCMatches:
+        plotImages(labels, images, 'PC128Match')
+
+def plotOutliers(eigenIdx):
+    (labels, dists, mean, freqMat, _, V) = getPCAData(getAllCalcImages())
+
+    outLoad = 0.05
+    T = np.dot(freqMat, V)
+
+    Tneg = [t for t in T if t[eigenIdx-1] <= -outLoad]
+    Tmid = [t for t in T if t[eigenIdx-1] > -outLoad and t[eigenIdx-1] < outLoad]
+    Tpos = [t for t in T if t[eigenIdx-1] >= outLoad]
+
+    legend = []
+    if np.shape(Tneg)[0] > 0:
+        freqMatFromPCsNeg = np.dot(Tneg, np.transpose(V)) + mean
+        meanNeg = np.mean(freqMatFromPCsNeg, axis=0)
+        plt.plot(dists, meanNeg, '-')
+        legend.append('$PC(' + str(eigenIdx) + ') \leq ' + str(-outLoad) + '$')
+
+    if np.shape(Tmid)[0] > 0:
+        freqMatFromPCsMid = np.dot(Tmid, np.transpose(V)) + mean
+        meanMid = np.mean(freqMatFromPCsMid, axis=0)
+        plt.plot(dists, meanMid, '-')
+        legend.append('$' + str(-outLoad) + ' < PC(' + str(eigenIdx) + ') < ' 
+                        + str(outLoad) + '$')
+
+    if np.shape(Tpos)[0] > 0:
+        freqMatFromPCsPos = np.dot(Tpos, np.transpose(V)) + mean
+        meanPos = np.mean(freqMatFromPCsPos, axis=0)
+        plt.plot(dists, meanPos, '-')
+        legend.append('$' + str(outLoad) + ' \geq PC(' + str(eigenIdx) + ')$')
+
+    plt.ylabel('Frequencies')
+    plt.xlabel('Distances (Angstroms)')
+    plt.legend(legend)
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(directory, 'eigenOutlier' + str(eigenIdx) + '.eps')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
+
+def plotImages(labels, images, filePrefix):
     selectImages = [im for im in images if im.label in labels]
     directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
     name = '-'.join(labels)
-    filename = os.path.join(directory, 'PCAMatch' + name + '.eps')
+    filename = os.path.join(directory, filePrefix + name + '.eps')
     xsp.datadefs.image.saveAllAsLineImages(filename, selectImages)
 
 def getExptPCAData(means):
@@ -234,4 +321,5 @@ def getImage():
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
 # getSynthExptRecognitionAnalysis(int(sys.argv[1]))
-plotBestMatches()
+for i in range(3, 6):
+    plotOutliers(i)
