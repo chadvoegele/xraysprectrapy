@@ -170,8 +170,30 @@ Petkov\\
     \caption{Si Lattice}
   \end{center}
 \end{figure}
-
 \pagebreak
+
+\section{Smoothing Analysis}
+smooth image and then normalize image
+solve for smoothing coefficient that results in the minimum l2 norm between
+smoothed SiLiCalc10001 and SiLiExpt1
+
+minimum at 0.0092
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/SmoothingCalibrationCurve.eps}
+    \caption{Smoothed - Expt Error vs Smoothing Coefficients}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/SmoothCalibrationSiLiCalc10001-SiLiExpt1.eps}
+    \caption{Smoothed SiLiCalc10001 vs SiLiExpt1}
+  \end{center}
+\end{figure}
+
+\clearpage
 
 \section{Noise Analysis}
 % exp noise example
