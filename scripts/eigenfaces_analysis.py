@@ -5,7 +5,8 @@ import math
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-from matplotlib import rc
+import matplotlib as mpl
+import script_utils as su
 
 def main():
     (_, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
@@ -16,9 +17,7 @@ def main():
     # freqMatFromPCs = np.dot(np.dot(freqMat, V), np.transpose(V)) + mean
     print(matToStr(TExp[:,0:2]))
 
-def getExptRecognitionAccuracy():
-    nPCs = 128
-
+def getExptRecognitionAccuracy(nPCs = 128):
     (labels, _, mean, freqMat, _, V) = getPCAData(getAllCalcImages())
     T = np.dot(freqMat, V)[:,0:nPCs]
 
@@ -35,20 +34,22 @@ def getExptRecognitionAccuracy():
 
 def getSynthExptRecognitionAnalysis(nPCs):
     nSamples = 500
-    tSmooth = 0.004
+    tSmooth = 0.0092
     direc = os.path.expanduser('~/work/all_rfdata_unique/')
-    unSmoothImages = getAllImages(direc, ['Calc', 'calc'])
+    unSmoothImages = su.getAllImages(direc, ['Calc', 'calc'])
     images = xsp.pdf.smooth_images(unSmoothImages, tSmooth)
     images = [xsp.pdf.normalize_image(im) for im in images]
     (labels, _, mean, freqMat, _, V) = getPCAData(images)
     T = np.dot(freqMat, V)[:,0:nPCs]
 
+    noiseMean = 0.004
     stdevs = [0, 0.003, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06]
+    # stdevs = [0.03]
     for stdev in stdevs:
-        randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, 0.004, stdev, 7, 14)
+        randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, noiseMean, stdev, 7, 14)
         accuracy = getSynthExptAccuracy(nSamples, nPCs, unSmoothImages, T, V,
                 mean, randomNoiseFn, tSmooth)
-        print(str(stdev) + "," + str(accuracy))
+        print(str(noiseMean) + "," + str(stdev) + "," + str(accuracy))
 
 def getSynthExptAccuracy(nSamples, nPCs, unSmoothImages, T, V,
         mean, randomNoiseFn, tSmooth):
@@ -70,7 +71,7 @@ def getIndexOfClosestVec(vecs, otherVec):
 def getIndexOfNthClosestVec(vecs, otherVec, n):
     # 1st closest: 0 index
     # 2nd closest: 1 index
-    return np.argsort([np.linalg.norm(vec - otherVec) for vec in vecs])[n-1]
+    return np.argsort([np.linalg.norm(vec - otherVec, ord=1) for vec in vecs])[n-1]
 
 def printAllCalcFreqs():
     calcImages = getAllCalcImages()
@@ -84,9 +85,9 @@ def plotEigenSpaceScatter():
     (exptLabels, freqExpt) = getExptPCAData(mean)
     TExp = np.dot(freqExpt, V)
 
-    pairs = ((0,1,2),
+    pairs = ((0,1,4),
              (1,2,2),
-             (2,3,3),
+             (2,3,2),
              (3,4,2))
     pairToStr = lambda x: (str(x[0]+1), str(x[1]+1))
 
@@ -104,15 +105,15 @@ def plotEigenSpaceScatter():
             exptIdx = exptLabels.index(exptLabel)
             plt.plot(T[calcIdx,pair[0]], T[calcIdx,pair[1]], 'o')
             plt.plot(TExp[exptIdx,pair[0]], TExp[exptIdx,pair[1]], '*')
-            legend.append(calcLabel)
-            legend.append(exptLabel)
+            # legend.append(calcLabel)
+            # legend.append(exptLabel)
         
         plt.legend(legend, ncol=2, loc=pair[2], numpoints=1)
         plt.xlabel('Loading: '+ pairToStr(pair)[0])
         plt.ylabel('Loading: '+ pairToStr(pair)[1])
-        directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+        directory = os.path.expanduser('~/work/final_figs')
         filename = 'eigenspace' + pairToStr(pair)[0] + '-' + \
-                        pairToStr(pair)[1] + '.eps'
+                        pairToStr(pair)[1] + '.png'
         filenameWPath = os.path.join(directory, filename)
         plt.savefig(filenameWPath, bbox_inches='tight')
         plt.close()
@@ -293,28 +294,18 @@ def getPCAData(calcImages):
             np.transpose(V))
 
 def getAllCalcImages():
-    directory = '~/work/all_rfdata_smoothed_unique/'
+    directory = '~/work/all_rfdata_unique/'
     filedir = os.path.expanduser(directory)
-    return getAllImages(filedir, ['Calc', 'calc'])
+    ims = su.getAllImages(filedir, ['Calc', 'calc'])
+    ims = xsp.pdf.smooth_images(ims, 0.0092)
+    ims = [xsp.pdf.normalize_image(im) for im in ims]
+    return ims
 
 def getAllExptImages():
-    directory = '~/work/all_rfdata_smoothed_unique/'
+    directory = '~/work/all_rfdata_unique/'
     filedir = os.path.expanduser(directory)
-    return getAllImages(filedir, ['Expt', 'expt'])
+    return su.getAllImages(filedir, ['Expt', 'expt'])
 
-def getAllImages(filedir, filterStrs):
-    calcFiles = [os.path.join(filedir, f) for f in os.listdir(filedir)
-                   if os.path.isfile(os.path.join(filedir, f))
-                   if any((s in f for s in filterStrs))]
-    calcImages = [xsp.datadefs.image.fromFile(f) for f in calcFiles]
-    return calcImages
-
-def getImage():
-    filename = '~/work/all_rfdata_smoothed_unique/SiLiExpt1.dat'
-    filename = os.path.expanduser(filename)
-    image = xsp.datadefs.image.fromFile(filename)
-    print(str(image))
-
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text', usetex=True)
+mpl.rcParams['font.size'] = 20
 getSynthExptRecognitionAnalysis(int(sys.argv[1]))
+# getExptRecognitionAccuracy(int(sys.argv[1]))
