@@ -141,13 +141,6 @@ def getAllExptImages():
     filedir = os.path.expanduser(directory)
     return getAllImages(filedir, ['Expt', 'expt'])
 
-def getAllImages(filedir, filterStrs):
-    calcFiles = [os.path.join(filedir, f) for f in os.listdir(filedir)
-                   if os.path.isfile(os.path.join(filedir, f))
-                   if any((s in f for s in filterStrs))]
-    calcImages = [xsp.datadefs.image.fromFile(f) for f in calcFiles]
-    return calcImages
-
 def findIndexOfMatch(A, y, epsilon):
     (_, residuals) = findSparseRep(A, y, epsilon)
     i = np.argmin(residuals)

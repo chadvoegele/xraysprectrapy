@@ -7,9 +7,6 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
-def matToStr(mat):
-    return '\n'.join(['\t'.join(['%.8f' % y for y in x]) for x in mat])
-
 def main():
     (_, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
 
