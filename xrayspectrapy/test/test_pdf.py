@@ -286,6 +286,26 @@ class PairDistFunctionTests(unittest.TestCase):
                 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8]
         return (distances, frequencies)
 
+    def image_test_data2(self):
+        distances = [0.049, 0.098, 0.147, 0.196, 0.245, 0.294, 0.343, 0.392,
+                0.441, 0.49, 0.539, 0.588, 0.637, 0.686, 0.735, 0.784, 0.833,
+                0.882, 0.931, 0.98, 1.029, 1.078, 1.127, 1.176, 1.225, 1.274,
+                1.323, 1.372, 1.421, 1.47, 1.519, 1.568, 1.617, 1.666, 1.715,
+                1.764, 1.813, 1.862, 1.911, 1.96, 2.009, 2.058, 2.107, 2.156,
+                2.205, 2.254, 2.303, 2.352, 2.401, 2.45, 2.499, 2.548, 2.597,
+                2.646, 2.695, 2.744, 2.793, 2.842, 2.891, 2.94, 2.989, 3.038,
+                3.087, 3.136, 3.185, 3.234, 3.283, 3.332, 3.381, 3.43, 3.479,
+                3.528, 3.577, 3.626, 3.675, 3.724, 3.773, 3.822, 3.871, 3.92,
+                3.969, 4.018, 4.067, 4.116, 4.165, 4.214, 4.263, 4.312, 4.361,
+                4.41, 4.459, 4.508, 4.557, 4.606, 4.655, 4.704, 4.753, 4.802,
+                4.851, 4.9]
+        frequencies = [0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0,
+                0, 48, 0, 0, 0, 24, 0, 0, 56, 0, 0, 0, 12, 0, 0, 8, 0, 24, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0,
+                24, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        return (distances, frequencies)
+
     def test_gaussian_blur(self):
         (distances, frequencies) = self.image_test_data1()
         expectedFreqs = [0.00000, 0.00000, 0.00000, 0.00000, 0.00000,
@@ -309,15 +329,31 @@ class PairDistFunctionTests(unittest.TestCase):
         for i in range(0, len(expectedFreqs)):
             self.assertAlmostEqual(expectedFreqs[i], smoothedFrequencies[i], 5)
 
-    def image_test_data2(self):
+    def test_smooth_images(self):
+        (distances, frequencies) = self.image_test_data1()
+        im1 = xsp.Image(distances, frequencies, 'test1')
+
+        (distances, frequencies) = self.image_test_data2()
+        im2 = xsp.Image(distances, frequencies, 'test2')
+
+        t = 0.005
+
+        smoothedIms1 = [xsp.pdf.smooth_image(im, t) for im in [im1, im2]]
+        smoothedIms2 = xsp.pdf.smooth_images([im1, im2], t)
+
+        for (im1, im2) in zip(smoothedIms1, smoothedIms2):
+            for (expected, actual) in zip(im1.frequencies, im2.frequencies):
+                self.assertAlmostEqual(expected, actual, 13)
+
+    def image_test_data3(self):
         distances = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8,
                      8.5, 9, 9.5, 10 ]
         frequencies = [-0.5, 0.5, 1, 0, 0, 0, 8.7, 10, 9.6, 4.5, 2.1, 0, -0.1,
                        -0.2, 3.1, 5, 6.8, 10, 9]
         return (distances, frequencies)
-
+ 
     def test_normalize_image(self):
-        (distances, frequencies) = self.image_test_data2()
+        (distances, frequencies) = self.image_test_data3()
         im = xsp.Image(distances, frequencies)
         expectedFreqs = [ 0, 0.012658227848101, 0.018987341772152,
                           0.006329113924051, 0.006329113924051, 0.006329113924051,

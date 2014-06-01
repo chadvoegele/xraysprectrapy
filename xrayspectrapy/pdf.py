@@ -57,6 +57,27 @@ def smooth_image(image, t):
              gaussian_blur(image.distances, image.frequencies, t),
              image.label)
 
+def smooth_images(images, t):
+    """Smoothes all images using a gaussian blur according to the smoothing
+       constant t."""
+
+    for i in range(1, len(images)):
+        if (images[0].distances != images[i].distances):
+            raise ValueError('distances must be the same for all images')
+
+    def calc_weights(x, xs, t):
+        return [math.exp(-(x-a)*(x-a)/4/t) for a in xs]
+
+    xs = images[0].distances
+    weights_mat = np.array([calc_weights(a, xs, t) for a in xs])
+    weights_mat = np.divide(weights_mat, sum(weights_mat))
+    ys_mat = np.array([im.frequencies for im in images])
+    smoothed_ys_mat = np.dot(ys_mat, weights_mat)
+
+    output = [xsp.Image(xs, smoothed_ys, im.label)
+                for (im, smoothed_ys) in zip(images, smoothed_ys_mat)]
+    return output
+
 def gaussian_blur(xs, ys, t):
     """For two vectors, xs and ys, and a smoothing constant,t, gaussian_blur
        calculates the weierstrass transform of the function xs -> ys."""

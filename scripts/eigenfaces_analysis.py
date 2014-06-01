@@ -38,7 +38,7 @@ def getSynthExptRecognitionAnalysis(nPCs):
     tSmooth = 0.004
     direc = os.path.expanduser('~/work/all_rfdata_unique/')
     unSmoothImages = getAllImages(direc, ['Calc', 'calc'])
-    images = [xsp.pdf.smooth_image(im, tSmooth) for im in unSmoothImages]
+    images = xsp.pdf.smooth_images(unSmoothImages, tSmooth)
     images = [xsp.pdf.normalize_image(im) for im in images]
     (labels, _, mean, freqMat, _, V) = getPCAData(images)
     T = np.dot(freqMat, V)[:,0:nPCs]
@@ -317,6 +317,4 @@ def getImage():
 
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=True)
-# getSynthExptRecognitionAnalysis(int(sys.argv[1]))
-for i in range(3, 6):
-    plotOutliers(i)
+getSynthExptRecognitionAnalysis(int(sys.argv[1]))
