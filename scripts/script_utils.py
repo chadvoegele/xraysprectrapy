@@ -1,11 +1,11 @@
 import xrayspectrapy as xsp
 import os
 
-def plotImages(outdir, images, filePrefix, fileExt):
+def plotImages(outdir, images, filePrefix, fileExt, legendLoc=1):
     directory = os.path.expanduser(outdir)
     name = '-'.join([im.label for im in images])
     filename = os.path.join(directory, filePrefix + name + '.' + fileExt)
-    xsp.datadefs.image.saveAllAsLineImages(filename, images)
+    xsp.datadefs.image.saveAllAsLineImages(filename, images, legendLoc=legendLoc)
 
 def getAllImages(filedir, filterStrs):
     calcFiles = [os.path.join(filedir, f) for f in os.listdir(filedir)
