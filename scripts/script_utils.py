@@ -1,4 +1,11 @@
 import xrayspectrapy as xsp
+import os
+
+def plotImages(outdir, images, filePrefix, fileExt):
+    directory = os.path.expanduser(outdir)
+    name = '-'.join([im.label for im in images])
+    filename = os.path.join(directory, filePrefix + name + '.' + fileExt)
+    xsp.datadefs.image.saveAllAsLineImages(filename, images)
 
 def getAllImages(filedir, filterStrs):
     calcFiles = [os.path.join(filedir, f) for f in os.listdir(filedir)
@@ -13,10 +20,10 @@ def matToStr(mat):
 def matDataToStr(data):
     if type(data) is str:
         return data
-    else if type(data) is int:
+    elif type(data) is int:
         return '%d' % data
-    else if type(data) is float:
+    elif type(data) is float:
         return '%.8f' % data
-    else
+    else:
         return str(data)
 

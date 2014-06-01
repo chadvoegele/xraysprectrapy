@@ -77,13 +77,6 @@ def plotBestMatches():
     for labels in bestMatches:
         plotImages(labels, images, 'SparseRep')
 
-def plotImages(labels, images, filePrefix):
-    selectImages = [im for im in images if im.label in labels]
-    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
-    name = '-'.join(labels)
-    filename = os.path.join(directory, filePrefix + name + '.eps')
-    xsp.datadefs.image.saveAllAsLineImages(filename, selectImages)
-
 def getSynthExptRecognitionAnalysis(epsilon):
     nSamples = 500
     tSmooth = 0.004
