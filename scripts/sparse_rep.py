@@ -4,6 +4,7 @@ import random
 import xrayspectrapy as xsp
 import numpy as np
 import spams as sp
+import script_utils as su
 
 def test_spams_test_data_A():
     A = [[0.2787,0.4058,0.2954,0.8957,0.9326,0.6305,0.6444,0.1163,0.8589],
@@ -60,39 +61,45 @@ def test_spams3():
         print("fail")
 
 def plotBestMatches():
-    images = [getAllCalcImages(), getAllExptImages()]
-    images = [im for sublist in images for im in sublist]
+    calcImages = getAllCalcImages()
+    calcImages = xsp.pdf.smooth_images(calcImages, 0.0092)
+    calcImages = [xsp.pdf.normalize_image(im) for im in calcImages]
+    images = [im for sublist in [calcImages, getAllExptImages()] for im in sublist]
 
     bestMatches = [['SiLiExpt3', 'SiLiCalc10001'],
                    ['SiLiExpt5', 'SiLiCalc10003'],
                    ['SiLiExpt6', 'SiLiCalc10616'],
                    ['ExptInAs', 'CalcInAs'],
-                   ['SiLiExpt7', 'SiLiCalc10382'],
+                   ['SiLiExpt7', 'SiLiCalc10001'],
                    ['SiLiExpt8', 'SiLiCalc10382'],
                    ['ExptGaAs', 'CalcGaAs'],
                    ['SiLiExpt2', 'SiLiCalc10001'],
-                   ['SiLiExpt4', 'SiLiCalc10003'],
+                   ['SiLiExpt4', 'SiLiCalc10001'],
                    ['SiLiExpt1', 'SiLiCalc10001']]
     
     for labels in bestMatches:
-        plotImages(labels, images, 'SparseRep')
+        selectImages = [im for im in images 
+                        if any([im.label in l for l in labels])]
+        su.plotImages('~/work/final_figs/', selectImages, 'SparseRep', 'png')
 
 def getSynthExptRecognitionAnalysis(epsilon):
     nSamples = 500
-    tSmooth = 0.004
+    tSmooth = 0.0092
     direc = os.path.expanduser('~/work/all_rfdata_unique/')
-    unSmoothImages = getAllImages(direc, ['Calc', 'calc'])
+    unSmoothImages = su.getAllImages(direc, ['Calc', 'calc'])
     # unSmoothImages = unSmoothImages[0:100]
-    images = [xsp.pdf.smooth_image(im, tSmooth) for im in unSmoothImages]
+    images = xsp.pdf.smooth_images(unSmoothImages, tSmooth)
     images = [xsp.pdf.normalize_image(im) for im in images]
     calcAsCols = np.transpose(np.array([im.frequencies for im in images]))
 
+    mean = 0.004
     stdevs = [0, 0.003, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06]
+    # stdevs = [0.01]
     for stdev in stdevs:
-        randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, 0, stdev, 7, 14)
+        randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, mean, stdev, 7, 14)
         accuracy = getSynthExptAccuracy(nSamples, unSmoothImages, calcAsCols,
                 epsilon, randomNoiseFn, tSmooth)
-        print(str(stdev) + "," + str(accuracy))
+        print(str(epsilon) + "," + str(mean) + "," + str(stdev) + "," + str(accuracy))
 
 def getSynthExptAccuracy(nSamples, unSmoothImages, calcAsCols,  
         epsilon, randomNoiseFn, tSmooth):
@@ -111,13 +118,29 @@ def runExptAnalysis():
     (calcLabels, calcCols) = getCalcDataAsCols()
     exptImages = getAllExptImages()
 
+    print("Expt\tMatch")
     for im in exptImages:
         index = findIndexOfMatch(calcCols, im.frequencies, 0.000001)
         calcMatch = calcLabels[index]
-        print("Expt: " + im.label + "; Match: " + calcMatch)
+        index2 = findIndexOfMatch(calcCols, im.frequencies, 0.000001, 2)
+        calcMatch2 = calcLabels[index2]
+        print(im.label + "\t" + calcMatch + "\t" + calcMatch2)
+
+def plotCompositeExptAnalysis():
+    (calcLabels, calcCols) = getCalcDataAsCols()
+    exptImages = getAllExptImages()
+    selectExptImage = [im for im in exptImages if im.label=='SiLiExpt8'][0]
+    (x, residuals) = findSparseRep(calcCols, selectExptImage.frequencies, 1e-6)
+    compositeMatchFreqs = np.dot(calcCols, x)
+    compositeImage = xsp.Image(selectExptImage.distances, compositeMatchFreqs, 
+            'CompositeImage')
+    su.plotImages('~/work/final_figs/', [compositeImage, selectExptImage], 
+            'SparseRepComp', 'png')
 
 def getCalcDataAsCols():
     images = getAllCalcImages()
+    images = xsp.pdf.smooth_images(images, 0.0092)
+    images = [xsp.pdf.normalize_image(im) for im in images]
     labels = [im.label for im in images]
     # data as cols
     freqMat = np.transpose(np.array([im.frequencies for im in images]))
@@ -125,18 +148,18 @@ def getCalcDataAsCols():
     return (labels, freqMat)
 
 def getAllCalcImages():
-    directory = '~/work/all_rfdata_smoothed_unique/'
+    directory = '~/work/all_rfdata_unique/'
     filedir = os.path.expanduser(directory)
-    return getAllImages(filedir, ['Calc', 'calc'])
+    return su.getAllImages(filedir, ['Calc', 'calc'])
 
 def getAllExptImages():
     directory = '~/work/all_rfdata_smoothed_unique/'
     filedir = os.path.expanduser(directory)
-    return getAllImages(filedir, ['Expt', 'expt'])
+    return su.getAllImages(filedir, ['Expt', 'expt'])
 
-def findIndexOfMatch(A, y, epsilon):
+def findIndexOfMatch(A, y, epsilon, nthMatch=1):
     (_, residuals) = findSparseRep(A, y, epsilon)
-    i = np.argmin(residuals)
+    i = np.argsort(residuals)[nthMatch-1]
     return i
 
 def findIndexOfMatchCoef(A, y, epsilon):
@@ -151,7 +174,7 @@ def findSparseRep(A, y, epsilon):
     yCol = np.asfortranarray(np.reshape(y, (len(y), 1)), dtype=float)
     A = np.asfortranarray(np.array(A), dtype=float)
     param = {'lambda1' : epsilon,
-            'numThreads' : -1,
+            'numThreads' : 4,
             'pos' : True,
             'mode' : 1}
     x = sp.lasso(yCol, D=A, **param).toarray()
@@ -159,8 +182,7 @@ def findSparseRep(A, y, epsilon):
     return (x, residuals)
 
 # runExptAnalysis()
-plotBestMatches()
+# plotBestMatches()
 # getSynthExptRecognitionAnalysis(float(sys.argv[1]))
 # plotBestMatches()
-# ims = getAllExptImages()
-# print(str([im for im in ims if im.label == 'ExptGaAs'][0]))
+plotCompositeExptAnalysis()
