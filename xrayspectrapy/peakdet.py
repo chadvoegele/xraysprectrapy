@@ -1,5 +1,13 @@
+import xrayspectrapy as xsp
 import sys
 from numpy import NaN, Inf, arange, isscalar, asarray, array
+
+def image_as_peaks(image, delta = 0.0001):
+    (das, ps) = image_peakdet(image, delta)
+    new_peaks = [sum((p for (da, p) in zip(das, ps) if da == db)) 
+                 for db in image.distances]
+    new_images = xsp.Image(image.distances, new_peaks, image.label)
+    return new_images
 
 def image_peakdet(image, delta = 0.0001):
     (maxpeak, _) = peakdet(image.frequencies, delta, image.distances)
