@@ -30,17 +30,19 @@ def plotSiLiMatch():
     exptIms = getAllExptImages()
     ims = [im for x in [calcIms, exptIms] for im in x]
     ims = [im for im in ims 
-             if any(s  in im.label for s in ['SiLiExpt1', 'SiLiCalc10001'])]
+             if any(s  in im.label for s in ['ExptGaAs', 'CalcGaAs'])]
     outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'SiLiMatch.png')
-    xsp.datadefs.image.saveAllAsLineImages(outfile, ims, legendLoc=8)
+    outfile = os.path.join(outdir, 'gaas_match.png')
+    xsp.datadefs.image.saveAllAsLineImages(outfile, ims, legendLoc=1)
 
-def plotExptImage():
+def plotExptImages():
     ims = getAllExptImages()
-    selectIm = [im for im in ims if im.label == 'SiLiExpt6'][0]
+    # selectIm = [im for im in ims if im.label == 'SiLiExpt6'][0]
     outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'SelectExptImage.png')
-    plt.plot(selectIm.distances, selectIm.frequencies, '-')
+    outfile = os.path.join(outdir, 'AllExptImage.png')
+
+    for im in ims:
+        plt.plot(im.distances, im.frequencies, '-')
     plt.xlabel('Distances (Angstroms)')
     plt.ylabel('Frequencies')
     plt.axis([1, 7, 0, 0.12])
@@ -71,6 +73,6 @@ def getAllExptImages():
 
 mpl.rcParams['font.size'] = 20
 # plotAllCalcImages()
-# plotExptImage()
-# plotSiLiMatch()
-plotNoisifiedImage()
+# plotExptImages()
+plotSiLiMatch()
+# plotNoisifiedImage()
