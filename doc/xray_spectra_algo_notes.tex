@@ -144,7 +144,7 @@ Petkov\\
 \noindent Calculated Data: Maria Chan\\
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.7]{figs/gaas_rdf_comparison.png}
+    \includegraphics[scale=0.7]{figs/gaas_pdf_comparison.eps}
     \caption{Ga As}
   \end{center}
 \end{figure}
@@ -155,7 +155,7 @@ Petkov\\
 \noindent Calculated Data: Maria Chan\\
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.7]{figs/inas_rdf_comparison.png}
+    \includegraphics[scale=0.7]{figs/inas_pdf_comparison.eps}
     \caption{In As}
   \end{center}
 \end{figure}
@@ -166,18 +166,29 @@ Petkov\\
 \noindent Calculated Data: http://materialsproject.org/materials/mp-149/ \\
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.7]{figs/si_lattice_comparison.png}
+    \includegraphics[scale=0.7]{figs/SmoothCalibrationSiLiCalc10001-SiLiExpt1.eps}
     \caption{Si Lattice}
   \end{center}
 \end{figure}
 \pagebreak
 
 \section{Smoothing Analysis}
-smooth image and then normalize image
-solve for smoothing coefficient that results in the minimum l2 norm between
-smoothed SiLiCalc10001 and SiLiExpt1
+Consider a function, $SmoothAndNormalize(i, t)$, that smoothes the image, $i$,
+with a smoothing coefficient of $t$ and then normalizes the smoothed image so
+that the weights sum to one. To calibrate the smoothing coefficient, we focus on
+the SiLi calculated and experimental matches, SiLiCalc10001 and SiLiExpt1. We
+want to find the smoothing coefficient, $t$, that after smoothing and
+normalization the calculated image is the closest match to the experimental
+image.
+\begin{align*}
+  \hat{t} = \underset{t}{\arg\min} \| X -
+    SmoothAndNormalize(C, t) \|_2
+\end{align*}
 
-minimum at 0.0092
+where $\|\cdot\|_2$ is the $L^2$ norm, $X$ is the experimental image, and $C$ is
+the calculated image.
+
+We found that $\hat{t} = 0.0092$.
 
 \begin{figure}[ht]
   \begin{center}
@@ -195,14 +206,99 @@ minimum at 0.0092
 
 \clearpage
 
-\section{Noise Analysis}
-% exp noise example
-% peak counts: estimation method, histogram, dist
-% peak location: estimation method, histogram, dist
-% noise peak heights: estimation method, histogram, dist
-% example noisy images
-% peak counts for max lengths
-\subsection{Peak Counts}
+\section{Matching Algorithm Evaluation}
+
+The goal of this project is to invent an algorithm that will find the best
+matching calculated image for a given experimental image. A more audacious goal
+is to find an algorithm that can decompose experimental image into a linear
+combination of a few calculated image.
+
+Before running an experiment, it is possible to theoretically predict the
+feasible structures that could occur during the experiment. Given this matching
+algorithm, during the experiment, we could match the experimental results back
+to the theoretically predicted structures. This would give an 'x-ray vision' into
+the structures, being able to see that atom locations as the experiment
+progresses.
+
+One way to evaluate the performance of a proposed matching algorithm is to use
+the set of known experimental and calculated matches. Taking the set of
+calculated images as a whole, the algorithm should be able to recover the
+calculated match given the experimental image. 
+
+The problem with this evaluation metric is that there are only three known
+calculated/experimental matches. This is not a large enough number of samples
+for good statistics. The reason there are not too many matching pairs is because
+the known structures at this time are periodic and can be observed
+experimentally through cheaper x-ray diffraction experiments. Non-periodic
+structures which are the focus of this project are studied precisely because
+their exact structures are not known.
+
+An alternative approach to using the calculated and experimental matching pairs
+directly is to simulate experimental images by adding random noise to a
+calculated image. The goal then becomes to recover the original calculated image
+given the simulated experimental image.
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/AllCalcImages.eps}
+    \caption{All Calculated Images}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/AllExptImages.eps}
+    \caption{All Experimental Images}
+  \end{center}
+\end{figure}
+
+\clearpage
+
+\subsection{Noise Analysis}
+The experimental images present three different varieties of noise compared to
+the calculated images.
+
+\begin{itemize}
+  \item{Tilt: Consider the baseline of the image to be the piecewise line
+      connecting the valleys of the image. The experimental images seem to have a
+      non-zero and slanted baseline compared to the calculated images which 
+      have a baseline at zero.} 
+  \item{Noise: Between the major peaks of the experimental images, there are
+      also several minor peaks. These minor peaks are not found in the calculated
+      images.}
+  \item{Peak Heights Difference: The heights of the major peaks vary between the
+      calculated and experimental images.}
+\end{itemize}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.7]{figs/inas_valleys.eps}
+    \caption{In As}
+  \end{center}
+\end{figure}
+
+To simulate these features, I first estimated the distributions of the number of
+peaks, peak locations, and the noise peak heights. 
+
+\subsubsection{Peak Counts}
+To estimate the distribution of number of peaks per image, I took all of the
+experimental images and estimated the number of peaks. Then I visually inspected
+the histogram to estimate the distribution.
+
+From the histogram, I concluded that the number of peaks is uniformly
+distributed between 7 and 15.
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/peak_counts_hist.eps}
+    \caption{Peak Count Distribution}
+  \end{center}
+\end{figure}
+
+Note that the estimation is strongly dependent on the maximum length of the
+image. The raw InAs spectrum goes out to 10 angstroms and has much more than 15
+peaks.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.5]{figs/inas_peaks_7ang.png}
@@ -214,6 +310,71 @@ minimum at 0.0092
   \begin{center}
     \includegraphics[scale=0.4]{figs/inas_peaks_10ang.png}
     \caption{InAs Expt, Max 10 Angstroms}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{Peak Locations}
+To estimate the distribution of the location of the peaks, I first took all of
+the experimental images and calculated the distances of all of the peaks. Then I
+charted this as a histogram to visually inspect the distribution.
+
+From the histogram, I concluded that the locations are uniformly distributed
+between 1.96 and 7.
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/peak_counts_hist.eps}
+    \caption{Peak Location Histogram}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{Noise Peak Heights}
+To add noise to the image, I random noise directly to the original frequencies.
+That is, $N = I + R$, where $N$ is a vector of frequencies for the noisfied
+image, $I$ is for the original image, and $R$ is for the random noise.
+
+In light of this, to estimate how much noise to add, I first calculated $E = X -
+C$, where $E$ is the error or noise to be added, $X$ is the experimental image,
+and $C$ is the calculated image. I considered the errors at different distances
+to be independent and thus considered all of the errors to be for any distance.
+Taking all of the errors together, I estimate the error distribution. From the
+histogram and cumulative distribution function, I concluded that the error
+distribution is most similar to a normal distribution. The estimate for the mean
+is 0.004 and standard deviation is 0.004.
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/noise_peak_dist.eps}
+    \caption{Noise Peak Heights Histogram}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/noise_peak_cdf.eps}
+    \caption{Noise Peak Heights Distribution}
+  \end{center}
+\end{figure}
+\clearpage
+
+\subsubsection{Sample Noisy Image}
+To generate the simulated experimental images, I first sample the number of
+peaks, the peak locations, and the peak heights from their respective
+distributions. Then this noise is added to the original image and the resulting
+image is re-normalized.
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/RandomImgs1x.eps}
+    \caption{Simulated Experimental Images, 1x Standard Deviation}
+  \end{center}
+\end{figure}
+
+\begin{figure}[ht]
+  \begin{center}
+    \includegraphics[scale=0.8]{figs/RandomImgs10x.eps}
+    \caption{Simulated Experimental Images, 10x Standard Deviation}
   \end{center}
 \end{figure}
 \clearpage
@@ -761,6 +922,9 @@ minimum at 0.0092
 \end{figure}
 \clearpage
 
+\section{Code}
+The code used to produce the results in this document as well as the document
+itself can be found here: https://github.com/chadvoegele/xraysprectrapy
 
 \section{Sources}
 \begin{verbatim}
@@ -769,18 +933,21 @@ http://en.wikipedia.org/wiki/Radial_distribution_function
 http://en.wikipedia.org/wiki/Weierstrass_transform
 http://matplotlib.org/api/mlab_api.html
 http://en.wikipedia.org/wiki/Principal_components_analysis
+First Principles Simulations of the Electrochemical Lithiation and Delithiation 
+  of Faceted Crystalline Silicon
+  Maria K. Y. Chan, C. Wolverton, and Jeffrey P. Greeley
+  Journal of the American Chemical Society 2012 134 (35), 14362-14374
+Pair Distribution Functions Analysis.
+  Petkov, V. 2012. 
+  Characterization of Materials. 1-14.
+"Face recognition using eigenfaces,"
+  Turk, M.A.; Pentland, A.P., 
+  Computer Vision and Pattern Recognition, 1991. Proceedings CVPR '91., 
+  IEEE Computer Society Conference on , vol., no., pp.586,591, 3-6 Jun 1991
+"Robust Face Recognition via Sparse Representation," 
+  Wright, J.; Yang, A.Y.; Ganesh, A.; Sastry, S.S.; Yi Ma, 
+  Pattern Analysis and Machine Intelligence, IEEE Transactions on , 
+  vol.31, no.2, pp.210,227, Feb. 2009
 \end{verbatim}
-
-%\pagebreak
-%\noindent \textbf{Appendix}\\
-%\emph{Convolution Commutativity}\\
-%\begin{align*}
-%&\int_{- \infty}^\infty f(\tau) g(t - \tau) d\tau\\
-%&u = t - \tau\\
-%&\tau = -\infty \rightarrow u = \infty\\
-%&\tau = \infty \rightarrow u = -\infty\\
-%&du = -d\tau\\
-%&- \int_\infty^{-\infty} f(t - u) g(u) du = \int_{-\infty}^\infty g(u) f(t-u)du\\
-%\end{align*}
 
 \end{document}

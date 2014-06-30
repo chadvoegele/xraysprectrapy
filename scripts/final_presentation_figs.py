@@ -9,7 +9,7 @@ def plotNoisifiedImage():
     tSmooth = 0.0092
     calcIm = getAllCalcImages()[1503]
     calcIm = smoothAndNormalize([calcIm], tSmooth)[0]
-    randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, 0.004, 0.03, 7, 14)
+    randomNoiseFn = lambda x: xsp.pdf.rand_normal_peaks(x, 0.004, 0.04, 7, 15)
     nSamples = 10
 
     plt.plot(calcIm.distances, calcIm.frequencies, '-', linewidth=5)
@@ -17,8 +17,8 @@ def plotNoisifiedImage():
         exprIm = xsp.pdf.noisify_image(calcIm, randomNoiseFn, tSmooth)
         plt.plot(exprIm.distances, exprIm.frequencies, '-')
 
-    outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'RandomImgs.png')
+    outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs/')
+    outfile = os.path.join(outdir, 'RandomImgs10x.eps')
     plt.xlabel('Distances (Angstroms)')
     plt.ylabel('Frequencies')
     plt.savefig(outfile, bbox_inches='tight')
@@ -30,16 +30,16 @@ def plotSiLiMatch():
     exptIms = getAllExptImages()
     ims = [im for x in [calcIms, exptIms] for im in x]
     ims = [im for im in ims 
-             if any(s  in im.label for s in ['ExptGaAs', 'CalcGaAs'])]
-    outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'gaas_match.png')
+             if any(s  in im.label for s in ['ExptInAs', 'CalcInAs'])]
+    outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs/')
+    outfile = os.path.join(outdir, 'inas_pdf_comparison.eps')
     xsp.datadefs.image.saveAllAsLineImages(outfile, ims, legendLoc=1)
 
 def plotExptImages():
     ims = getAllExptImages()
     # selectIm = [im for im in ims if im.label == 'SiLiExpt6'][0]
-    outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'AllExptImage.png')
+    outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs/')
+    outfile = os.path.join(outdir, 'AllExptImages.eps')
 
     for im in ims:
         plt.plot(im.distances, im.frequencies, '-')
@@ -52,8 +52,8 @@ def plotExptImages():
 def plotAllCalcImages():
     ims = getAllCalcImages()
     ims = smoothAndNormalize(ims, 0.0092)
-    outdir = os.path.expanduser('~/work/final_figs')
-    outfile = os.path.join(outdir, 'AllCalcImages.png')
+    outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs/')
+    outfile = os.path.join(outdir, 'AllCalcImages.eps')
     xsp.datadefs.image.saveAllAsLineImages(outfile, ims, False)
 
 def smoothAndNormalize(ims, t):
@@ -71,8 +71,8 @@ def getAllExptImages():
     filedir = os.path.expanduser(directory)
     return su.getAllImages(filedir, ['Expt', 'expt'])
 
-mpl.rcParams['font.size'] = 20
+# mpl.rcParams['font.size'] = 20
 # plotAllCalcImages()
 # plotExptImages()
-plotSiLiMatch()
-# plotNoisifiedImage()
+# plotSiLiMatch()
+plotNoisifiedImage()

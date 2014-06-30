@@ -7,12 +7,16 @@ def plotImages(outdir, images, filePrefix, fileExt, legendLoc=1):
     filename = os.path.join(directory, filePrefix + name + '.' + fileExt)
     xsp.datadefs.image.saveAllAsLineImages(filename, images, legendLoc=legendLoc)
 
-def getAllImages(filedir, filterStrs):
-    calcFiles = [os.path.join(filedir, f) for f in os.listdir(filedir)
-                   if os.path.isfile(os.path.join(filedir, f))
-                   if any((s in f for s in filterStrs))]
-    calcImages = [xsp.datadefs.image.fromFile(f) for f in calcFiles]
-    return calcImages
+def getAllImages(filedir, filterStrs=None):
+    if filterStrs is None:
+        files = [os.path.join(filedir, f) for f in os.listdir(filedir)
+                       if os.path.isfile(os.path.join(filedir, f))]
+    else:
+        files = [os.path.join(filedir, f) for f in os.listdir(filedir)
+                       if os.path.isfile(os.path.join(filedir, f))
+                       if any((s in f for s in filterStrs))]
+    images = [xsp.datadefs.image.fromFile(f) for f in files]
+    return images
 
 def matToStr(mat):
     return '\n'.join(['\t'.join([matDataToStr(y) for y in x]) for x in mat])
