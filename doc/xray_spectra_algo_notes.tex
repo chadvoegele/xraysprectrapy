@@ -380,9 +380,33 @@ image is re-normalized.
 \clearpage
 
 \section{Recognition Using Eigenfaces}
-% experimental accuracy - by pca dim
-% synthetic accuracy - by pca dim
+In this section, we apply the approach outlined in Turk and Pentland's
+"Eigenfaces for Recognition".
+
+Let $C = [c_1 \ldots c_n]^T$ be the calculated images and $\Psi$ be the
+column-wise means of the $C$.
+
+First compute the principal components of $C$ by singular value decomposition.
+\begin{align*}
+  \mbox{Cov}(C) \sim (C - \Psi)^T (C - \Psi) = W \Sigma^2 W^T
+\end{align*}
+
+Here $W$ are matrices that contain the loadings of C. Each column has different
+principal components and the rows span the dimenions of the images.
+
+The first $L$ loadings, $T_L$, are computed with the first $L$ principal
+components. Let $W_L$ be a matrix with the first $L$ columns of $W$. Then 
+$T_L = (C - \Psi) W_L$.
+
+Suppose $X$ is the target image that we are trying to find a best match for.
+First compute the loadings, $S_L$, for $X$ as $S_L = (X - \Psi) W_L$. Then use
+the $L^p$ norm to find the closest image in PCA space.
+\begin{align*}
+  \hat{i} = \arg \min_i \| T_L(i,:) - S_L \|_p
+\end{align*}
+
 \subsection{Mean Image}
+Below shows the mean image, $\Psi$, over all of the calculated images.
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/all_calc_images_mean.png}
