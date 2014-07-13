@@ -206,7 +206,7 @@ We found that $\hat{t} = 0.0092$.
 
 \clearpage
 
-\section{Matching Algorithm Evaluation}
+\section{Matching Algorithm Evaluation \label{s:algo_eval}}
 
 The goal of this project is to invent an algorithm that will find the best
 matching calculated image for a given experimental image. A more audacious goal
@@ -416,6 +416,23 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsection{Variance Explained by Principal Components}
+Principal component analysis projects the data onto an orthogonal space. Thus in
+PCA space, we can consider the variance contributed by each of the principal
+components separately and can identify those principal components that
+contribute most to the variance of the data set. To identify how many principal
+components are needed to explain the majority of the variation in the data set,
+we can look at the cumulative variance.
+
+\begin{align*}
+  C_k = \sum_{i=1}^{k} \sigma_i^2 / \sum_{i=1}^n \sigma_i^2
+\end{align*}
+
+where $C_k$ is the variance explained by $k$ principal components and
+$\sigma_i^2$ is the variance of principal component $i$.
+
+From the graph, we notice that around 15 principal components explain about 95\%
+of the data.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/eigenfaces_varexplained.eps}
@@ -424,7 +441,12 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \end{figure}
 \clearpage
 
+% TODO: need to rerun the results with the new smoothing coefficient.
 \subsection{Eigenfaces}
+!!! Need to rerun all of these results with the changed smoothing coefficient!!!
+Here, we plot the eigenfaces to see if any key features of the images are
+revealed. Not much of anything is noteworthy.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/eigenface1.eps}
@@ -448,6 +470,14 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsection{Data in Eigenspace}
+Below shows the data in principal component space for the most significant
+principal components.
+
+One feature we observe is that the first principal component separates the
+experiemental data very well and in fact appropriately sorts the silicon lithium
+structures by that amount of lithium. Higher principal components are useful for
+distinguishing the experimental images.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/eigenspace1-2.eps}
@@ -518,6 +548,14 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsubsection{Eigenspace Outliers}
+Given that the higher order principal components did not separate the
+experimental images, we looked at the images with high loading values. 
+
+From the plots below, we notice that the higher order principal components
+capture the very high peaks in images. Indeed for some images that have very few
+peaks, after normalization those peaks will become much higher than those images
+that have many peaks.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/eigenOutlier1.eps}
@@ -555,6 +593,8 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsection{Experimental Image Recognition}
+Here we compute the best matches in PCA space for the experimental images for
+the first 3, 10, and all principal components.
 \subsubsection{3 Principal Components}
 \begin{table}[h]
   \begin{center}
@@ -831,12 +871,37 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsection{Synthetic Experimental Image Recognition}
+Here we run the alternative analysis approach outlined in section
+\ref{s:algo_eval}. The exact method is described below.
+
+\begin{verbatim}
+For i = 1 to nSamples
+  calculatedImage = randomlySelectFrom(calculatedImages)
+  experimentalImage = addNoise(calculatedImage)
+  bestMatchImage = findBestMatch(experimentalImage)
+
+  If bestMatchImage == calculatedImage Then
+    increment successCounter
+
+Accuracy = successCounter / nSamples
+\end{verbatim}
+
+% TODO: how many principal components were used for this??
+Below we consider findBestMatch functions that find the minimum L1 and L2 norm
+in PCA space for ?all? principal components.
+
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/accuracy_with_pca.png}
     \caption{Synthetic Experimental Images Accuracy}
   \end{center}
 \end{figure}
+
+Here we check how the accuracy varies as we increase the number of principal
+components. We see that the accuracy does not change much after 15
+principal components. This aligns with our conclusion from the cumulative
+variance chart that 15 principal components are sufficient to describe much of
+the variance in the data set.
 
 \begin{figure}[ht]
   \begin{center}
@@ -847,14 +912,75 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \section{Recognition Using Sparse Representations}
+Following the lead of Wright, et al. in "Robust Face Recognition via Sparse
+Representation", we apply the method of recognition via sparse representation
+to the xray images. The idea is that we try to express the experimental image as
+a sparse linear combination of calculated images. If the solution is
+sufficiently sparse, then the sparse solution can be found by minimizing the
+$L_1$ norm of the coefficients.  The best match is then are the images that have
+non-zero coefficients. One application of this that is outlined in Wright et
+al's paper is to choose the best match as the image that produces the lowest
+error after being multiplied by its coefficient.
+
+\begin{align*}
+\left(\begin{array}{ccccc}
+c_{11} & c_{12} & c_{13} & \ldots & c_{1n} \\
+\ldots & \ldots & \ldots & \ldots & \ldots \\
+c_{m1} & c_{m2} & c_{m3} & \ldots & c_{mn} \\
+\end{array}\right)
+\left(\begin{array}{c}
+y_1\\
+y_2\\
+y_3\\
+\ldots\\
+y_n\\
+\end{array}
+\right)
+= \left(\begin{array}{c}
+x_1\\
+\ldots\\
+x_m\\
+\end{array}
+\right)
++
+\left(\begin{array}{c}
+e_1\\
+\ldots\\
+e_m\\
+\end{array}
+\right)
+\end{align*}
+
+\begin{align*}
+c_i&: i^{th} \mbox{ Calculated Image} \\
+C &= [c_1 c_2 \cdots c_n] \\
+x&: \mbox{Target Image}\\
+\end{align*}
+
+We wish to find the solution that is sparsest with bounded error. This can be
+found via a second order cone programming problem.
+
+\begin{align*}
+\hat{y} = \underset{y}{\arg\min} \| y \|_1 \hspace{1em}|\hspace{1em} \|Cy - x\|_2 \leq \epsilon
+\end{align*}
+
+% TODO: rerun results with new smoothing coefficient
 \subsection{Experimental Image Recognition}
+!!! Need to rerun the results with the new smoothing coefficient. !!!
+Here we show the best matches for the experimental images using the sparse
+representation method. This method is able to recover the correct matches for
+the known experimental and calculated pairs. The matches for most of the
+experimental images seem reasonable as well. For SiLi experiments 6 through 8
+though, the matches are quite bad.
+
 \begin{table}[h]
+  \begin{center}
   \begin{tabular}{|l|l|}
     \hline
     \textbf{Experiment} & \textbf{Match} \\ \hline
-    ExptGaAs            & CalcGaAs       \\ \hline
-    ExptInAs            & CalcInAs       \\ \hline
-    SiLiExpt1           & SiLiCalc10001  \\ \hline
+    ExptGaAs            & \textbf{CalcGaAs}       \\ \hline
+    ExptInAs            & \textbf{CalcInAs}       \\ \hline
+    SiLiExpt1           & \textbf{SiLiCalc10001}  \\ \hline
     SiLiExpt2           & SiLiCalc10001  \\ \hline
     SiLiExpt3           & SiLiCalc10001  \\ \hline
     SiLiExpt4           & SiLiCalc10003  \\ \hline
@@ -864,6 +990,7 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
     SiLiExpt8           & SiLiCalc10382  \\ \hline
   \end{tabular}
   \caption{Experimental Image Recognition}
+  \end{center}
 \end{table}
 
 \begin{figure}[ht]
@@ -938,6 +1065,9 @@ Below shows the mean image, $\Psi$, over all of the calculated images.
 \clearpage
 
 \subsection{Synthetic Experimental Image Recognition}
+Running the synthetic experimental image recognition analysis with the sparse
+representation approach yields surprisingly bad results. Below the results are
+plotted with different error bounds.
 \begin{figure}[ht]
   \begin{center}
     \includegraphics[scale=0.8]{figs/SparseRepSynthExprAccuracy.png}
