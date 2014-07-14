@@ -30,7 +30,16 @@ def getExptRecognitionAccuracy(nPCs = 128):
         exptMatches = [labels[findMatch(x)] for x in TExp]
         output.append(exptMatches)
 
-    print('\n'.join(('\t'.join((x for x in row)) for row in output)))
+    output = np.transpose(np.array(output))
+    output = output[output[:,0].argsort(),:]
+    tableRows = [' & '.join(dataRow) + '\\\\ \hline \n' 
+                    for dataRow in output]
+    outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+    filename = 'expt_recog_with_' + str(nPCs) + 'pcs.tex'
+    outputFile = os.path.join(outDir, filename)
+    f = open(outputFile,'w')
+    [f.write(row) for row in tableRows]
+    f.close()
 
 def getSynthExptRecognitionAnalysis(nPCs):
     nSamples = 500
@@ -59,24 +68,40 @@ def getSynthExptAccuracy(nSamples, nPCs, unSmoothImages, T, V,
         randImg = unSmoothImages[idx]
         exprImg = xsp.pdf.noisify_image(randImg, randomNoiseFn, tSmooth)
         TExpr = np.dot(exprImg.frequencies - mean, V)[0:nPCs]
-        matchIdx = getIndexOfClosestVec(T, TExpr)
+        matchIdx = getIndexOfNthClosestVec(T, TExpr, 1)
         if idx == matchIdx:
             success = success + 1
 
     return success / nSamples
 
-def getIndexOfClosestVec(vecs, otherVec):
-    return np.argmin([np.linalg.norm(vec - otherVec) for vec in vecs])
-
 def getIndexOfNthClosestVec(vecs, otherVec, n):
     # 1st closest: 0 index
     # 2nd closest: 1 index
-    return np.argsort([np.linalg.norm(vec - otherVec, ord=1) for vec in vecs])[n-1]
+    return np.argsort([np.linalg.norm(vec - otherVec, ord=2) for vec in vecs])[n-1]
 
 def printAllCalcFreqs():
     calcImages = getAllCalcImages()
     freqMatMean = np.array([im.frequencies for im in calcImages])
     print(matToStr(freqMatMean))
+
+def exportExptEigenspaceTables():
+    (calcLabels, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
+    (exptLabels, freqExpt) = getExptPCAData(mean)
+    TExp = np.dot(freqExpt, V)
+
+    for i in range(0, 2):
+        sortIdx = TExp[:,i].argsort()
+        dataAsStr = [['%.4f' % x for x in row] for row in TExp[sortIdx,0:2]]
+        tableRows = [label + ' & ' + ' & '.join(data) + '\\\\ \hline \n' 
+                        for (label, data) 
+                        in zip(np.array(exptLabels)[sortIdx], dataAsStr)]
+
+        outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+        filename = 'expt_eigen_sort_by_pc' + str(i+1) + '.tex'
+        outputFile = os.path.join(outDir, filename)
+        f = open(outputFile,'w')
+        [f.write(row) for row in tableRows]
+        f.close()
 
 def plotEigenSpaceScatter():
     (calcLabels, _, mean, freqMat, eigenvalues, V) = getPCAData(getAllCalcImages())
@@ -105,15 +130,15 @@ def plotEigenSpaceScatter():
             exptIdx = exptLabels.index(exptLabel)
             plt.plot(T[calcIdx,pair[0]], T[calcIdx,pair[1]], 'o')
             plt.plot(TExp[exptIdx,pair[0]], TExp[exptIdx,pair[1]], '*')
-            # legend.append(calcLabel)
-            # legend.append(exptLabel)
+            legend.append(calcLabel)
+            legend.append(exptLabel)
         
         plt.legend(legend, ncol=2, loc=pair[2], numpoints=1)
         plt.xlabel('Loading: '+ pairToStr(pair)[0])
         plt.ylabel('Loading: '+ pairToStr(pair)[1])
-        directory = os.path.expanduser('~/work/final_figs')
+        directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
         filename = 'eigenspace' + pairToStr(pair)[0] + '-' + \
-                        pairToStr(pair)[1] + '.png'
+                        pairToStr(pair)[1] + '.eps'
         filenameWPath = os.path.join(directory, filename)
         plt.savefig(filenameWPath, bbox_inches='tight')
         plt.close()
@@ -174,55 +199,55 @@ def plotAllCalcFreqsWMean():
     plt.axis([1, 8, 0, np.max(freqMatMean)*1.1])
     plt.ylabel('Frequencies')
     plt.xlabel('Distances (Angstroms)')
-    filename = os.path.expanduser('~/work/allIm_mean.png')
+    direc = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(direc, 'all_calc_images_mean.png')
     plt.savefig(filename, dpi=250, bbox_inches='tight')
     plt.close()
 
-def plotBestMatches():
-    images = [getAllCalcImages(), getAllExptImages()]
-    images = [im for sublist in images for im in sublist]
+def plotBestMatches(nPCs = 128):
+    calcImages = getAllCalcImages()
+    allImages = [calcImages, getAllExptImages()]
+    allImages = [im for sublist in allImages for im in sublist]
 
-    best3PCMatches = [['ExptGaAs',  'SiLiCalc11436', 'SiLiCalc11634'],
-            ['ExptInAs',  'SiLiCalc10643', 'SiLiCalc10560'],
-            ['SiLiExpt1', 'SiLiCalc10208', 'SiLiCalc10315'],
-            ['SiLiExpt2', 'SiLiCalc10317', 'SiLiCalc10287'],
-            ['SiLiExpt3', 'SiLiCalc10287', 'SiLiCalc10239'],
-            ['SiLiExpt4', 'SiLiCalc10229', 'SiLiCalc10225'],
-            ['SiLiExpt5', 'SiLiCalc10225', 'SiLiCalc10256'],
-            ['SiLiExpt6', 'SiLiCalc10322', 'SiLiCalc10225'],
-            ['SiLiExpt7', 'SiLiCalc10225', 'SiLiCalc10322'],
-            ['SiLiExpt8', 'SiLiCalc10225', 'SiLiCalc10322']]
+    (labels, _, mean, freqMat, _, V) = getPCAData(calcImages)
+    T = np.dot(freqMat, V)[:,0:nPCs]
+    (exptLabels, freqExpt) = getExptPCAData(mean)
+    TExp = np.dot(freqExpt, V)[:,0:nPCs]
+
+    exptLabels = np.array(exptLabels)
+    sortIdx = exptLabels.argsort()
+    exptLabels = exptLabels[sortIdx]
+    TExp = TExp[sortIdx,:]
     
-    for labels in best3PCMatches:
-        plotImages(labels, images, 'PC3Match')
+    outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+    filename = 'eigen_match_plots_' + str(nPCs) + 'PCs.tex'
+    outputFile = os.path.join(outDir, filename)
+    f = open(outputFile,'w')
 
-    best10PCMatches = [['ExptGaAs', 'CalcGaAs', 'SiLiCalc10329'],
-            ['ExptInAs', 'SiLiCalc10646', 'SiLiCalc10805'],  
-            ['SiLiExpt1', 'SiLiCalc10213', 'SiLiCalc10215'],
-            ['SiLiExpt2', 'SiLiCalc10001', 'SiLiCalc10003'],
-            ['SiLiExpt3', 'SiLiCalc10257', 'SiLiCalc10317'],
-            ['SiLiExpt4', 'SiLiCalc10257', 'SiLiCalc10258'],
-            ['SiLiExpt5', 'SiLiCalc10445', 'SiLiCalc10616'],
-            ['SiLiExpt6', 'SiLiCalc10445', 'SiLiCalc10616'],
-            ['SiLiExpt7', 'SiLiCalc10445', 'SiLiCalc10693'],
-            ['SiLiExpt8', 'SiLiCalc10445', 'SiLiCalc10693']]
+    for i in range(0,len(exptLabels)):
+        label = exptLabels[i]
+        oneTExp = TExp[i,:]
+        findBestMatch = lambda x: getIndexOfNthClosestVec(T, x, 1)
+        bestMatchLabel = labels[findBestMatch(oneTExp)]
 
-    for labels in best10PCMatches:
-        plotImages(labels, images, 'PC10Match')
+        findSecondBestMatch = lambda x: getIndexOfNthClosestVec(T, x, 2)
+        secondBestMatchLabel = labels[findSecondBestMatch(oneTExp)]
 
-    best128PCMatches = [['ExptGaAs', 'CalcGaAs', 'SiLiCalc10445'],
-            ['ExptInAs', 'SiLiCalc10429', 'SiLiCalc10602'],
-            ['SiLiExpt1', 'SiLiCalc10194', 'SiLiCalc10001'],
-            ['SiLiExpt2', 'SiLiCalc10001', 'SiLiCalc10003'],
-            ['SiLiExpt3', 'SiLiCalc10258', 'SiLiCalc10229'],
-            ['SiLiExpt4', 'SiLiCalc10258', 'SiLiCalc11436'],
-            ['SiLiExpt5', 'SiLiCalc10616', 'SiLiCalc11337'],
-            ['SiLiExpt6', 'SiLiCalc10616', 'SiLiCalc10693'],
-            ['SiLiExpt7', 'SiLiCalc10693', 'SiLiCalc11337'],
-            ['SiLiExpt8', 'SiLiCalc10693', 'SiLiCalc10651']]
+        matchLabels = [label, bestMatchLabel, secondBestMatchLabel]
+        plotPrefix = 'PC' + str(nPCs) + 'Match'
+        plotImages(matchLabels, allImages, plotPrefix)
 
-    for labels in best128PCMatches:
-        plotImages(labels, images, 'PC128Match')
+        imFilename = plotPrefix + '-'.join(matchLabels)
+        imCaption = ', '.join(matchLabels)
+
+        f.write('\\begin{figure}[ht]\n')
+        f.write('\t\\begin{center}\n')
+        f.write('\t\t\\includegraphics[scale=0.8]{figs/' + imFilename + '.eps}\n')
+        f.write('\t\\caption{PCA Matches: ' + imCaption + '}\n')
+        f.write('\t\\end{center}\n')
+        f.write('\\end{figure}\n')
+
+    f.close()
 
 def plotOutliers(eigenIdx):
     (labels, dists, mean, freqMat, _, V) = getPCAData(getAllCalcImages())
@@ -259,6 +284,58 @@ def plotOutliers(eigenIdx):
     plt.legend(legend)
     directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
     filename = os.path.join(directory, 'eigenOutlier' + str(eigenIdx) + '.eps')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
+
+def plotSynthAccuracyByPrinComp():
+    # nPCs accuracyRun1 accuracyRun2 ...
+    data =  [[3,       0.018,   0.020,   0.012,   0.022,   0.016],
+             [5,       0.028,   0.034,   0.034,   0.034,   0.028],
+             [8,       0.048,   0.044,   0.060,   0.058,   0.062],
+             [16,      0.092,   0.104,   0.116,   0.096,   0.084],
+             [24,      0.108,   0.142,   0.122,   0.102,   0.120],
+             [36,      0.114,   0.112,   0.110,   0.110,   0.112],
+             [48,      0.126,   0.114,   0.098,   0.114,   0.098],
+             [60,      0.102,   0.138,   0.112,   0.096,   0.096],
+             [72,      0.120,   0.086,   0.104,   0.090,   0.106],
+             [84,      0.116,   0.096,   0.114,   0.102,   0.130],
+             [96,      0.096,   0.096,   0.122,   0.112,   0.126],
+             [108,     0.100,   0.114,   0.118,   0.108,   0.102],
+             [128,     0.116,   0.104,   0.102,   0.114,   0.096]]
+    data = np.array(data)
+    
+    for i in range(1, np.shape(data)[1]):
+        plt.plot(data[:,0], data[:,i], '-')
+
+    plt.ylabel('Accuracy')
+    plt.xlabel('Number of Principal Components')
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(directory, 'accuracyByNumberOfPCs.eps')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
+
+def plotSynthAccuracy():
+    # mean stdev l1acc l2acc pc128l1accuracy pc128l2accuracy
+    data = [[0.004, 0,     0.824, 0.872, 0.896, 0.878],
+            [0.004, 0.003, 0.76,  0.766, 0.808, 0.78],
+            [0.004, 0.01,  0.514, 0.422, 0.456, 0.432],
+            [0.004, 0.02,  0.276, 0.18,  0.212, 0.186],
+            [0.004, 0.03,  0.156, 0.122, 0.086, 0.094],
+            [0.004, 0.04,  0.094, 0.064, 0.078, 0.096],
+            [0.004, 0.05,  0.06,  0.038, 0.042, 0.032],
+            [0.004, 0.06,  0.036, 0.028, 0.014, 0.024]]
+    data = np.array(data)
+    
+    plt.plot(data[:,1]/0.004, data[:,2], '-', label='L1 Norm')
+    plt.plot(data[:,1]/0.004, data[:,3], '-', label='L2 Norm')
+    plt.plot(data[:,1]/0.004, data[:,4], '-', label='PCA - L1')
+    plt.plot(data[:,1]/0.004, data[:,5], '-', label='PCA - L2')
+
+    plt.ylabel('Accuracy')
+    plt.xlabel('k x Standard Deviations')
+    plt.legend()
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(directory, 'PCAAccuracyVsLpNorms.eps')
     plt.savefig(filename, bbox_inches='tight')
     plt.close()
 
@@ -306,6 +383,6 @@ def getAllExptImages():
     filedir = os.path.expanduser(directory)
     return su.getAllImages(filedir, ['Expt', 'expt'])
 
-mpl.rcParams['font.size'] = 20
-getSynthExptRecognitionAnalysis(int(sys.argv[1]))
-# getExptRecognitionAccuracy(int(sys.argv[1]))
+# mpl.rcParams['font.size'] = 20
+# getSynthExptRecognitionAnalysis(int(sys.argv[1]))
+plotSynthAccuracy()

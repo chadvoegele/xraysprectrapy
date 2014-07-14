@@ -5,6 +5,7 @@ import xrayspectrapy as xsp
 import numpy as np
 import spams as sp
 import script_utils as su
+import matplotlib.pyplot as plt
 
 def test_spams_test_data_A():
     A = [[0.2787,0.4058,0.2954,0.8957,0.9326,0.6305,0.6444,0.1163,0.8589],
@@ -64,23 +65,38 @@ def plotBestMatches():
     calcImages = getAllCalcImages()
     calcImages = xsp.pdf.smooth_images(calcImages, 0.0092)
     calcImages = [xsp.pdf.normalize_image(im) for im in calcImages]
-    images = [im for sublist in [calcImages, getAllExptImages()] for im in sublist]
+    allImages = [im for sublist in [getAllExptImages(), calcImages] 
+                    for im in sublist]
 
-    bestMatches = [['SiLiExpt3', 'SiLiCalc10001'],
-                   ['SiLiExpt5', 'SiLiCalc10003'],
-                   ['SiLiExpt6', 'SiLiCalc10616'],
-                   ['ExptInAs', 'CalcInAs'],
-                   ['SiLiExpt7', 'SiLiCalc10001'],
-                   ['SiLiExpt8', 'SiLiCalc10382'],
-                   ['ExptGaAs', 'CalcGaAs'],
-                   ['SiLiExpt2', 'SiLiCalc10001'],
-                   ['SiLiExpt4', 'SiLiCalc10001'],
-                   ['SiLiExpt1', 'SiLiCalc10001']]
-    
-    for labels in bestMatches:
-        selectImages = [im for im in images 
-                        if any([im.label in l for l in labels])]
-        su.plotImages('~/work/final_figs/', selectImages, 'SparseRep', 'png')
+    results = runExptAnalysis()
+    results = np.array(results)
+    results = results[results[:,0].argsort(),:]
+
+    plotPrefix = 'SparseRep'
+
+    outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+    filename = 'sparseRepMatchPlots.tex'
+    outputFile = os.path.join(outDir, filename)
+    f = open(outputFile,'w')
+
+    for result in results:
+        imFilename = plotPrefix + '-'.join(result) + '.eps'
+        imCaption = ', '.join(result)
+
+        selectImages = [im for im in allImages
+                        if any([im.label in l for l in result])]
+        outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+        filename = os.path.join(outdir, imFilename)
+        xsp.datadefs.image.saveAllAsLineImages(filename, selectImages)
+
+        f.write('\\begin{figure}[ht]\n')
+        f.write('\t\\begin{center}\n')
+        f.write('\t\t\\includegraphics[scale=0.8]{figs/' + imFilename + '}\n')
+        f.write('\t\\caption{Sparse Representation Matches: ' + imCaption + '}\n')
+        f.write('\t\\end{center}\n')
+        f.write('\\end{figure}\n')
+
+    f.close()
 
 def getSynthExptRecognitionAnalysis(epsilon):
     nSamples = 500
@@ -118,24 +134,89 @@ def runExptAnalysis():
     (calcLabels, calcCols) = getCalcDataAsCols()
     exptImages = getAllExptImages()
 
-    print("Expt\tMatch")
+    output = []
     for im in exptImages:
         index = findIndexOfMatch(calcCols, im.frequencies, 0.000001)
         calcMatch = calcLabels[index]
         index2 = findIndexOfMatch(calcCols, im.frequencies, 0.000001, 2)
         calcMatch2 = calcLabels[index2]
-        print(im.label + "\t" + calcMatch + "\t" + calcMatch2)
+        output.append([im.label, calcMatch, calcMatch2])
+
+    return output
+
+def exportExptMatchesTable():
+    results = runExptAnalysis()
+    results = np.array(results)
+    results = results[results[:,0].argsort(),:]
+    tableRows = [' & '.join(dataRow) + '\\\\ \hline \n' 
+                    for dataRow in results]
+    outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+    filename = 'exptSparseRepRecognition.tex'
+    outputFile = os.path.join(outDir, filename)
+    f = open(outputFile,'w')
+    [f.write(row) for row in tableRows]
+    f.close()
 
 def plotCompositeExptAnalysis():
     (calcLabels, calcCols) = getCalcDataAsCols()
     exptImages = getAllExptImages()
-    selectExptImage = [im for im in exptImages if im.label=='SiLiExpt8'][0]
-    (x, residuals) = findSparseRep(calcCols, selectExptImage.frequencies, 1e-6)
-    compositeMatchFreqs = np.dot(calcCols, x)
-    compositeImage = xsp.Image(selectExptImage.distances, compositeMatchFreqs, 
-            'CompositeImage')
-    su.plotImages('~/work/final_figs/', [compositeImage, selectExptImage], 
-            'SparseRepComp', 'png')
+    exptImages.sort(key=lambda im: im.label)
+    plotPrefix = 'SparseRep'
+
+    outDir = os.path.expanduser('~/code/xrayspectrapy/doc/autotex')
+    filename = 'sparseRepCompositePlots.tex'
+    outputFile = os.path.join(outDir, filename)
+    f = open(outputFile,'w')
+
+    for exptImage in exptImages:
+        (x, residuals) = findSparseRep(calcCols, exptImage.frequencies, 1e-6)
+        compositeMatchFreqs = np.dot(calcCols, x)
+        compositeImage = xsp.Image(exptImage.distances, compositeMatchFreqs, 
+                'CompositeImage')
+        imFilename = plotPrefix + exptImage.label + 'Composite.eps'
+        imCaption = exptImage.label
+
+        outdir = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+        filename = os.path.join(outdir, imFilename)
+        xsp.datadefs.image.saveAllAsLineImages(filename, 
+                [exptImage, compositeImage])
+
+        f.write('\\begin{figure}[ht]\n')
+        f.write('\t\\begin{center}\n')
+        f.write('\t\t\\includegraphics[scale=0.8]{figs/' + imFilename + '}\n')
+        f.write('\t\\caption{Sparse Representation Composite Match: ' + imCaption + '}\n')
+        f.write('\t\\end{center}\n')
+        f.write('\\end{figure}\n')
+
+    f.close()
+
+def plotSynthAccuracy():
+    # mean stdev l1acc l2acc sparseRep01 sparseRep001 SR0001 SR000001
+    data = [[0.004, 0,     0.824, 0.872, 0.012,  0.099,  0.421,  0.617], 
+            [0.004, 0.003, 0.76,  0.766, 0.023,  0.124,  0.38 ,  0.544],  
+            [0.004, 0.01,  0.514, 0.422, 0.018,  0.106,  0.194,  0.295],  
+            [0.004, 0.02,  0.276, 0.18,  0.007,  0.093,  0.132,  0.142],  
+            [0.004, 0.03,  0.156, 0.122, 0.013,  0.087,  0.093,  0.084],  
+            [0.004, 0.04,  0.094, 0.064, 0.009,  0.046,  0.076,  0.07 ],  
+            [0.004, 0.05,  0.06,  0.038, 0.006,  0.043,  0.04 ,  0.046],  
+            [0.004, 0.06,  0.036, 0.028, 0.01 ,  0.032,  0.037,  0.03 ]]
+
+    data = np.array(data)
+    
+    plt.plot(data[:,1]/0.004, data[:,2], '-', label='L1 Norm')
+    plt.plot(data[:,1]/0.004, data[:,3], '-', label='L2 Norm')
+    plt.plot(data[:,1]/0.004, data[:,4], '-', label='e = 0.01')
+    plt.plot(data[:,1]/0.004, data[:,5], '-', label='e = 0.001')
+    plt.plot(data[:,1]/0.004, data[:,6], '-', label='e = 0.0001')
+    plt.plot(data[:,1]/0.004, data[:,7], '-', label='e = 0.000001')
+
+    plt.ylabel('Accuracy')
+    plt.xlabel('k x Standard Deviations')
+    plt.legend()
+    directory = os.path.expanduser('~/code/xrayspectrapy/doc/figs')
+    filename = os.path.join(directory, 'SparseRepAccuracyVsLpNorms.eps')
+    plt.savefig(filename, bbox_inches='tight')
+    plt.close()
 
 def getCalcDataAsCols():
     images = getAllCalcImages()
@@ -153,7 +234,7 @@ def getAllCalcImages():
     return su.getAllImages(filedir, ['Calc', 'calc'])
 
 def getAllExptImages():
-    directory = '~/work/all_rfdata_smoothed_unique/'
+    directory = '~/work/all_rfdata_unique/'
     filedir = os.path.expanduser(directory)
     return su.getAllImages(filedir, ['Expt', 'expt'])
 
@@ -182,7 +263,5 @@ def findSparseRep(A, y, epsilon):
     return (x, residuals)
 
 # runExptAnalysis()
-# plotBestMatches()
 # getSynthExptRecognitionAnalysis(float(sys.argv[1]))
-# plotBestMatches()
 plotCompositeExptAnalysis()

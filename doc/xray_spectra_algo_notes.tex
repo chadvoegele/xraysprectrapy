@@ -29,7 +29,7 @@
 \setlength{\floatsep}{0in}
 \section{Radial Density Function}
 \subsection{Calculation of Distances with Periodicity}
-Suppose a large chemical structure has uncountably many atoms but the follow a
+Suppose a large chemical structure has uncountably many atoms but they follow a
 periodic pattern of $n$ atoms every $p$ Angstroms. The atom locations within a
 period are given by $a_1, a_2, \ldots, a_n$ where $a_i \in \mathbb{R}^3$. The
 radial density function is the distribution of pairwise distances between these
@@ -211,7 +211,7 @@ We found that $\hat{t} = 0.0092$.
 The goal of this project is to invent an algorithm that will find the best
 matching calculated image for a given experimental image. A more audacious goal
 is to find an algorithm that can decompose experimental image into a linear
-combination of a few calculated image.
+combination of a few calculated images.
 
 Before running an experiment, it is possible to theoretically predict the
 feasible structures that could occur during the experiment. Given this matching
@@ -277,15 +277,15 @@ the calculated images.
   \end{center}
 \end{figure}
 
-To simulate these features, I first estimated the distributions of the number of
+To simulate these features, we first estimated the distributions of the number of
 peaks, peak locations, and the noise peak heights. 
 
 \subsubsection{Peak Counts}
-To estimate the distribution of number of peaks per image, I took all of the
-experimental images and estimated the number of peaks. Then I visually inspected
+To estimate the distribution of number of peaks per image, we took all of the
+experimental images and estimated the number of peaks. Then we visually inspected
 the histogram to estimate the distribution.
 
-From the histogram, I concluded that the number of peaks is uniformly
+From the histogram, we concluded that the number of peaks is uniformly
 distributed between 7 and 15.
 
 \begin{figure}[ht]
@@ -315,11 +315,11 @@ peaks.
 \clearpage
 
 \subsubsection{Peak Locations}
-To estimate the distribution of the location of the peaks, I first took all of
-the experimental images and calculated the distances of all of the peaks. Then I
-charted this as a histogram to visually inspect the distribution.
+To estimate the distribution of the location of the peaks, we first took all of
+the experimental images and calculated the distances of all of the peaks. Then
+we charted this as a histogram to visually inspect the distribution.
 
-From the histogram, I concluded that the locations are uniformly distributed
+From the histogram, we concluded that the locations are uniformly distributed
 between 1.96 and 7.
 \begin{figure}[ht]
   \begin{center}
@@ -330,16 +330,16 @@ between 1.96 and 7.
 \clearpage
 
 \subsubsection{Noise Peak Heights}
-To add noise to the image, I random noise directly to the original frequencies.
-That is, $N = I + R$, where $N$ is a vector of frequencies for the noisfied
-image, $I$ is for the original image, and $R$ is for the random noise.
+To add noise to the image, we add random noise directly to the original
+frequencies.  That is, $N = I + R$, where $N$ is a vector of frequencies for the
+noisified image, $I$ is for the original image, and $R$ is for the random noise.
 
-In light of this, to estimate how much noise to add, I first calculated $E = X -
+In light of this, to estimate how much noise to add, we first calculated $E = X -
 C$, where $E$ is the error or noise to be added, $X$ is the experimental image,
-and $C$ is the calculated image. I considered the errors at different distances
+and $C$ is the calculated image. We considered the errors at different distances
 to be independent and thus considered all of the errors to be for any distance.
-Taking all of the errors together, I estimate the error distribution. From the
-histogram and cumulative distribution function, I concluded that the error
+Taking all of the errors together, we estimate the error distribution. From the
+histogram and cumulative distribution function, we concluded that the error
 distribution is most similar to a normal distribution. The estimate for the mean
 is 0.004 and standard deviation is 0.004.
 
@@ -359,7 +359,7 @@ is 0.004 and standard deviation is 0.004.
 \clearpage
 
 \subsubsection{Sample Noisy Image}
-To generate the simulated experimental images, I first sample the number of
+To generate the simulated experimental images, we first sample the number of
 peaks, the peak locations, and the peak heights from their respective
 distributions. Then this noise is added to the original image and the resulting
 image is re-normalized.
@@ -392,7 +392,7 @@ First compute the principal components of $C$ by singular value decomposition.
 \end{align*}
 
 Here $W$ are matrices that contain the loadings of C. Each column has different
-principal components and the rows span the dimenions of the images.
+principal components and the rows span the dimensions of the images.
 
 The first $L$ loadings, $T_L$, are computed with the first $L$ principal
 components. Let $W_L$ be a matrix with the first $L$ columns of $W$. Then 
@@ -441,9 +441,7 @@ of the data.
 \end{figure}
 \clearpage
 
-% TODO: need to rerun the results with the new smoothing coefficient.
 \subsection{Eigenfaces}
-!!! Need to rerun all of these results with the changed smoothing coefficient!!!
 Here, we plot the eigenfaces to see if any key features of the images are
 revealed. Not much of anything is noteworthy.
 
@@ -474,9 +472,9 @@ Below shows the data in principal component space for the most significant
 principal components.
 
 One feature we observe is that the first principal component separates the
-experiemental data very well and in fact appropriately sorts the silicon lithium
-structures by that amount of lithium. Higher principal components are useful for
-distinguishing the experimental images.
+experimental data very well and in fact appropriately sorts the silicon lithium
+structures by that amount of lithium. Higher principal components are not as
+useful for distinguishing the experimental images.
 
 \begin{figure}[ht]
   \begin{center}
@@ -490,16 +488,7 @@ distinguishing the experimental images.
   \begin{tabular}{|l|l|l|}
     \hline
     \textbf{Label} & \textbf{Loading 1} & \textbf{Loading 2} \\ \hline
-    SiLiExpt1      & -0.0893            & 0.00982            \\ \hline
-    SiLiExpt2      & -0.0794            & -0.006             \\ \hline
-    SiLiExpt3      & -0.0616            & -0.0055            \\ \hline
-    SiLiExpt4      & -0.0522            & -0.0086            \\ \hline
-    SiLiExpt5      & -0.0356            & -0.0128            \\ \hline
-    ExptGaAs       & -0.0288            & 0.00994            \\ \hline
-    SiLiExpt7      & -0.0258            & -0.0101            \\ \hline
-    SiLiExpt6      & -0.0231            & -0.0051            \\ \hline
-    SiLiExpt8      & -0.0226            & -0.0111            \\ \hline
-    ExptInAs       & -0.0038            & -0.0044            \\ \hline
+    \input{autotex/expt_eigen_sort_by_pc1.tex}
   \end{tabular}
   \caption{Experimental Data Sorted by Loading 1}
   \end{center}
@@ -510,16 +499,7 @@ distinguishing the experimental images.
   \begin{tabular}{|l|l|l|}
     \hline
     \textbf{Label} & \textbf{Loading 1} & \textbf{Loading 2} \\ \hline
-    SiLiExpt5      & -0.0356            & -0.0128            \\ \hline
-    SiLiExpt8      & -0.0226            & -0.0111            \\ \hline
-    SiLiExpt7      & -0.0258            & -0.0101            \\ \hline
-    SiLiExpt4      & -0.0522            & -0.0086            \\ \hline
-    SiLiExpt2      & -0.0794            & -0.006             \\ \hline
-    SiLiExpt3      & -0.0616            & -0.0055            \\ \hline
-    SiLiExpt6      & -0.0231            & -0.0051            \\ \hline
-    ExptInAs       & -0.0038            & -0.0044            \\ \hline
-    SiLiExpt1      & -0.0893            & 0.00982            \\ \hline
-    ExptGaAs       & -0.0288            & 0.00994            \\ \hline
+    \input{autotex/expt_eigen_sort_by_pc2.tex}
   \end{tabular}
   \caption{Experimental Data Sorted by Loading 2}
   \end{center}
@@ -601,90 +581,13 @@ the first 3, 10, and all principal components.
 \begin{tabular}{|l|l|l|l|l|l|}
 \hline
 \textbf{Image}     & \textbf{Best Match} & \textbf{2}    & \textbf{3}    & \textbf{4}    & \textbf{5}    \\ \hline
-\textbf{ExptGaAs}  & SiLiCalc11436       & SiLiCalc11634 & SiLiCalc11967 & SiLiCalc12738 & SiLiCalc10225 \\ \hline
-\textbf{ExptInAs}  & SiLiCalc10643       & SiLiCalc10560 & SiLiCalc10693 & SiLiCalc10617 & SiLiCalc10621 \\ \hline
-\textbf{SiLiExpt1} & SiLiCalc10208       & SiLiCalc10315 & SiLiCalc10317 & SiLiCalc10188 & SiLiCalc10187 \\ \hline
-\textbf{SiLiExpt2} & SiLiCalc10317       & SiLiCalc10287 & SiLiCalc10320 & SiLiCalc10283 & SiLiCalc10273 \\ \hline
-\textbf{SiLiExpt3} & SiLiCalc10287       & SiLiCalc10239 & SiLiCalc10259 & SiLiCalc10317 & SiLiCalc10232 \\ \hline
-\textbf{SiLiExpt4} & SiLiCalc10229       & SiLiCalc10225 & SiLiCalc10232 & SiLiCalc10239 & SiLiCalc10259 \\ \hline
-\textbf{SiLiExpt5} & SiLiCalc10225       & SiLiCalc10256 & SiLiCalc10232 & SiLiCalc10229 & SiLiCalc10231 \\ \hline
-\textbf{SiLiExpt6} & SiLiCalc10322       & SiLiCalc10225 & SiLiCalc10247 & SiLiCalc10229 & SiLiCalc10256 \\ \hline
-\textbf{SiLiExpt7} & SiLiCalc10225       & SiLiCalc10322 & SiLiCalc10256 & SiLiCalc10247 & SiLiCalc10229 \\ \hline
-\textbf{SiLiExpt8} & SiLiCalc10225       & SiLiCalc10322 & SiLiCalc10247 & SiLiCalc10337 & SiLiCalc10256 \\ \hline
+\input{autotex/expt_recog_with_3pcs.tex}
 \end{tabular}
   \caption{Recognition with 3 Principal Components}
   \end{center}
 \end{table}
 
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchExptGaAs-SiLiCalc11436-SiLiCalc11634.eps}
-  \caption{PCA Matches: ExptGaAs, SiLiCalc11436, SiLiCalc11634}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchExptInAs-SiLiCalc10643-SiLiCalc10560.eps}
-  \caption{PCA Matches: ExptInAs, SiLiCalc10643, SiLiCalc10560}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt1-SiLiCalc10208-SiLiCalc10315.eps}
-  \caption{PCA Matches: SiLiExpt1, SiLiCalc10208, SiLiCalc10315}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt2-SiLiCalc10317-SiLiCalc10287.eps}
-    \caption{PCA Matches: SiLiExpt2, SiLiCalc10317, SiLiCalc10287}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt3-SiLiCalc10287-SiLiCalc10239.eps}
-    \caption{PCA Matches: SiLiExpt3, SiLiCalc10287, SiLiCalc10239}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt4-SiLiCalc10229-SiLiCalc10225.eps}
-    \caption{PCA Matches: SiLiExpt4, SiLiCalc10229, SiLiCalc10225}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt5-SiLiCalc10225-SiLiCalc10256.eps}
-    \caption{PCA Matches: SiLiExpt5, SiLiCalc10225, SiLiCalc10256}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt6-SiLiCalc10322-SiLiCalc10225.eps}
-    \caption{PCA Matches: SiLiExpt6, SiLiCalc10322, SiLiCalc10225}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt7-SiLiCalc10225-SiLiCalc10322.eps}
-    \caption{PCA Matches: SiLiExpt7, SiLiCalc10225, SiLiCalc10322}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC3MatchSiLiExpt8-SiLiCalc10225-SiLiCalc10322.eps}
-    \caption{PCA Matches: SiLiExpt8, SiLiCalc10225, SiLiCalc10322}
-  \end{center}
-\end{figure}
+\input{autotex/eigen_match_plots_3PCs.tex}
 \clearpage
 
 \subsubsection{10 Principal Components}
@@ -693,90 +596,13 @@ the first 3, 10, and all principal components.
 \begin{tabular}{|l|l|l|l|l|l|}
 \hline
 \textbf{Image}     & \textbf{Best Match} & \textbf{2}    & \textbf{3}             & \textbf{4}    & \textbf{5}    \\ \hline
-\textbf{ExptGaAs}  & \textbf{CalcGaAs}   & SiLiCalc10329 & SiLiCalc11337          & SiLiCalc11436 & SiLiCalc10571 \\ \hline
-\textbf{ExptInAs}  & SiLiCalc10646       & SiLiCalc10805 & SiLiCalc10792          & SiLiCalc10836 & SiLiCalc10767 \\ \hline
-\textbf{SiLiExpt1} & SiLiCalc10213       & SiLiCalc10215 & \textbf{SiLiCalc10001} & SiLiCalc10003 & SiLiCalc10313 \\ \hline
-\textbf{SiLiExpt2} & SiLiCalc10001       & SiLiCalc10003 & SiLiCalc10209          & SiLiCalc10317 & SiLiCalc10313 \\ \hline
-\textbf{SiLiExpt3} & SiLiCalc10257       & SiLiCalc10317 & SiLiCalc10259          & SiLiCalc10258 & SiLiCalc10256 \\ \hline
-\textbf{SiLiExpt4} & SiLiCalc10257       & SiLiCalc10258 & SiLiCalc10256          & SiLiCalc10229 & SiLiCalc10232 \\ \hline
-\textbf{SiLiExpt5} & SiLiCalc10445       & SiLiCalc10616 & SiLiCalc11436          & SiLiCalc10329 & SiLiCalc11337 \\ \hline
-\textbf{SiLiExpt6} & SiLiCalc10445       & SiLiCalc10616 & SiLiCalc11436          & SiLiCalc10693 & SiLiCalc11337 \\ \hline
-\textbf{SiLiExpt7} & SiLiCalc10445       & SiLiCalc10693 & SiLiCalc11337          & SiLiCalc10616 & SiLiCalc10482 \\ \hline
-\textbf{SiLiExpt8} & SiLiCalc10445       & SiLiCalc10693 & SiLiCalc10329          & SiLiCalc11337 & SiLiCalc10482 \\ \hline
+\input{autotex/expt_recog_with_10pcs.tex}
 \end{tabular}
   \caption{Recognition with 10 Principal Components}
   \end{center}
 \end{table}
 
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchExptGaAs-CalcGaAs-SiLiCalc10329.eps}
-    \caption{PCA Matches: ExptGaAs, CalcGaAs, SiLiCalc10329}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchExptInAs-SiLiCalc10646-SiLiCalc10805.eps}
-    \caption{PCA Matches: ExptInAs, SiLiCalc10646, SiLiCalc10805}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt1-SiLiCalc10213-SiLiCalc10215.eps}
-    \caption{PCA Matches: SiLiExpt1, SiLiCalc10213, SiLiCalc10215}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt2-SiLiCalc10001-SiLiCalc10003.eps}
-    \caption{PCA Matches: SiLiExpt2, SiLiCalc10001, SiLiCalc10003}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt3-SiLiCalc10257-SiLiCalc10317.eps}
-    \caption{PCA Matches: SiLiExpt3, SiLiCalc10257, SiLiCalc10317}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt4-SiLiCalc10257-SiLiCalc10258.eps}
-    \caption{PCA Matches: SiLiExpt4, SiLiCalc10257, SiLiCalc10258}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt5-SiLiCalc10445-SiLiCalc10616.eps}
-    \caption{PCA Matches: SiLiExpt5, SiLiCalc10445, SiLiCalc10616}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt6-SiLiCalc10445-SiLiCalc10616.eps}
-    \caption{PCA Matches: SiLiExpt6, SiLiCalc10445, SiLiCalc10616}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt7-SiLiCalc10445-SiLiCalc10693.eps}
-    \caption{PCA Matches: SiLiExpt7, SiLiCalc10445, SiLiCalc10693}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/PC10MatchSiLiExpt8-SiLiCalc10445-SiLiCalc10693.eps}
-    \caption{PCA Matches: SiLiExpt8, SiLiCalc10445, SiLiCalc10693}
-  \end{center}
-\end{figure}
+\input{autotex/eigen_match_plots_10PCs.tex}
 \clearpage
 
 \subsubsection{128 Principal Components}
@@ -784,90 +610,12 @@ the first 3, 10, and all principal components.
 \begin{tabular}{|l|l|l|l|l|l|}
 \hline
 \textbf{Image}     & \textbf{Best Match} & \textbf{2}             & \textbf{3}    & \textbf{4}    & \textbf{5}    \\ \hline
-\textbf{ExptGaAs}  & \textbf{CalcGaAs}   & SiLiCalc10445          & SiLiCalc11436 & SiLiCalc10693 & SiLiCalc11337 \\ \hline
-\textbf{ExptInAs}  & SiLiCalc10429       & SiLiCalc10602          & SiLiCalc10838 & SiLiCalc10901 & SiLiCalc10607 \\ \hline
-\textbf{SiLiExpt1} & SiLiCalc10194       & \textbf{SiLiCalc10001} & SiLiCalc10003 & SiLiCalc10136 & SiLiCalc10147 \\ \hline
-\textbf{SiLiExpt2} & SiLiCalc10001       & SiLiCalc10003          & SiLiCalc10194 & SiLiCalc10136 & SiLiCalc10147 \\ \hline
-\textbf{SiLiExpt3} & SiLiCalc10258       & SiLiCalc10229          & SiLiCalc10245 & SiLiCalc11436 & SiLiCalc10259 \\ \hline
-\textbf{SiLiExpt4} & SiLiCalc10258       & SiLiCalc11436          & SiLiCalc10229 & SiLiCalc11337 & SiLiCalc11634 \\ \hline
-\textbf{SiLiExpt5} & SiLiCalc10616       & SiLiCalc11337          & SiLiCalc10693 & SiLiCalc11436 & SiLiCalc11336 \\ \hline
-\textbf{SiLiExpt6} & SiLiCalc10616       & SiLiCalc10693          & SiLiCalc11337 & SiLiCalc11436 & SiLiCalc11336 \\ \hline
-\textbf{SiLiExpt7} & SiLiCalc10693       & SiLiCalc11337          & SiLiCalc10482 & SiLiCalc10616 & SiLiCalc10651 \\ \hline
-\textbf{SiLiExpt8} & SiLiCalc10693       & SiLiCalc10651          & SiLiCalc11337 & SiLiCalc10482 & SiLiCalc10616 \\ \hline
+\input{autotex/expt_recog_with_128pcs.tex}
 \end{tabular}
   \caption{Recognition with 128 Principal Components}
 \end{table}
 
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchExptGaAs-CalcGaAs-SiLiCalc10445.eps}
-\caption{PCA Matches: ExptGaAs, CalcGaAs, SiLiCalc10445}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchExptInAs-SiLiCalc10429-SiLiCalc10602.eps}
-\caption{PCA Matches: ExptInAs, SiLiCalc10429, SiLiCalc10602}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt1-SiLiCalc10194-SiLiCalc10001.eps}
-\caption{PCA Matches: SiLiExpt1, SiLiCalc10194, SiLiCalc10001}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt2-SiLiCalc10001-SiLiCalc10003.eps}
-\caption{PCA Matches: SiLiExpt2, SiLiCalc10001, SiLiCalc10003}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt3-SiLiCalc10258-SiLiCalc10229.eps}
-\caption{PCA Matches: SiLiExpt3, SiLiCalc10258, SiLiCalc10229}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt4-SiLiCalc10258-SiLiCalc11436.eps}
-\caption{PCA Matches: SiLiExpt4, SiLiCalc10258, SiLiCalc11436}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt5-SiLiCalc10616-SiLiCalc11337.eps}
-\caption{PCA Matches: SiLiExpt5, SiLiCalc10616, SiLiCalc11337}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt6-SiLiCalc10616-SiLiCalc10693.eps}
-\caption{PCA Matches: SiLiExpt6, SiLiCalc10616, SiLiCalc10693}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt7-SiLiCalc10693-SiLiCalc11337.eps}
-\caption{PCA Matches: SiLiExpt7, SiLiCalc10693, SiLiCalc11337}
-\end{center}
-\end{figure}
-
-\begin{figure}[ht]
-\begin{center}
-\includegraphics[scale=0.8]{figs/PC128MatchSiLiExpt8-SiLiCalc10693-SiLiCalc10651.eps}
-\caption{PCA Matches: SiLiExpt8, SiLiCalc10693, SiLiCalc10651}
-\end{center}
-\end{figure}
-
+\input{autotex/eigen_match_plots_128PCs.tex}
 \clearpage
 
 \subsection{Synthetic Experimental Image Recognition}
@@ -886,13 +634,12 @@ For i = 1 to nSamples
 Accuracy = successCounter / nSamples
 \end{verbatim}
 
-% TODO: how many principal components were used for this??
 Below we consider findBestMatch functions that find the minimum L1 and L2 norm
-in PCA space for ?all? principal components.
+in PCA space for all principal components.
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.8]{figs/accuracy_with_pca.png}
+    \includegraphics[scale=0.8]{figs/PCAAccuracyVsLpNorms.eps}
     \caption{Synthetic Experimental Images Accuracy}
   \end{center}
 \end{figure}
@@ -903,10 +650,13 @@ principal components. This aligns with our conclusion from the cumulative
 variance chart that 15 principal components are sufficient to describe much of
 the variance in the data set.
 
+The different lines in Figure \ref{f:accByPC} refer to different trials of the
+synthetic experimental image analysis.
+
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.8]{figs/accuracy_by_num_pc.png}
-    \caption{Accuracy vs Number of Principal Components}
+    \includegraphics[scale=0.8]{figs/accuracyByNumberOfPCs.eps}
+    \caption{Accuracy vs Number of Principal Components\label{f:accByPC}}
   \end{center}
 \end{figure}
 \clearpage
@@ -964,104 +714,27 @@ found via a second order cone programming problem.
 \hat{y} = \underset{y}{\arg\min} \| y \|_1 \hspace{1em}|\hspace{1em} \|Cy - x\|_2 \leq \epsilon
 \end{align*}
 
-% TODO: rerun results with new smoothing coefficient
 \subsection{Experimental Image Recognition}
-!!! Need to rerun the results with the new smoothing coefficient. !!!
 Here we show the best matches for the experimental images using the sparse
 representation method. This method is able to recover the correct matches for
 the known experimental and calculated pairs. The matches for most of the
 experimental images seem reasonable as well. For SiLi experiments 6 through 8
 though, the matches are quite bad.
 
+All results following were run with an error bound of 0.000001.
+
 \begin{table}[h]
   \begin{center}
-  \begin{tabular}{|l|l|}
+  \begin{tabular}{|l|l|l|}
     \hline
-    \textbf{Experiment} & \textbf{Match} \\ \hline
-    ExptGaAs            & \textbf{CalcGaAs}       \\ \hline
-    ExptInAs            & \textbf{CalcInAs}       \\ \hline
-    SiLiExpt1           & \textbf{SiLiCalc10001}  \\ \hline
-    SiLiExpt2           & SiLiCalc10001  \\ \hline
-    SiLiExpt3           & SiLiCalc10001  \\ \hline
-    SiLiExpt4           & SiLiCalc10003  \\ \hline
-    SiLiExpt5           & SiLiCalc10003  \\ \hline
-    SiLiExpt6           & SiLiCalc10616  \\ \hline
-    SiLiExpt7           & SiLiCalc10382  \\ \hline
-    SiLiExpt8           & SiLiCalc10382  \\ \hline
+    \textbf{Experiment} & \textbf{Match} & \textbf{Second Best Match} \\ \hline
+    \input{autotex/exptSparseRepRecognition.tex}
   \end{tabular}
   \caption{Experimental Image Recognition}
   \end{center}
 \end{table}
 
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepExptGaAs-CalcGaAs.eps}
-    \caption{ExptGaAs, CalcGaAs}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepExptInAs-CalcInAs.eps}
-    \caption{ExptInAs, CalcInAs}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt1-SiLiCalc10001.eps}
-    \caption{SiLiExpt1, SiLiCalc10001}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt2-SiLiCalc10001.eps}
-    \caption{SiLiExpt2, SiLiCalc10001}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt3-SiLiCalc10001.eps}
-    \caption{SiLiExpt3, SiLiCalc10001}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt4-SiLiCalc10003.eps}
-    \caption{SiLiExpt4, SiLiCalc10003}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt5-SiLiCalc10003.eps}
-    \caption{SiLiExpt5, SiLiCalc10003}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt6-SiLiCalc10616.eps}
-    \caption{SiLiExpt6, SiLiCalc10616}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt7-SiLiCalc10382.eps}
-    \caption{SiLiExpt7, SiLiCalc10382}
-  \end{center}
-\end{figure}
-
-\begin{figure}[ht]
-  \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSiLiExpt8-SiLiCalc10382.eps}
-    \caption{SiLiExpt8, SiLiCalc10382}
-  \end{center}
-\end{figure}
+\input{autotex/sparseRepMatchPlots.tex}
 \clearpage
 
 \subsection{Synthetic Experimental Image Recognition}
@@ -1070,10 +743,20 @@ representation approach yields surprisingly bad results. Below the results are
 plotted with different error bounds.
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[scale=0.8]{figs/SparseRepSynthExprAccuracy.png}
+    \includegraphics[scale=0.8]{figs/SparseRepAccuracyVsLpNorms.eps}
     \caption{Synthetic Experimental Image Recognition Accuracy}
   \end{center}
 \end{figure}
+\clearpage
+
+\subsection{Composite Image}
+The sparse representation method by definition solves for the sparsest linear
+combination of images that best match the input image. In the context of xray
+spectra, it is possible that the experimental image is a linear combination of
+images from multiple structures. This is due to the time averaging as the
+structure changes and also locality in the structure. Here we plot the linear
+combinations to see how they compare to the experimental image.
+\input{autotex/sparseRepCompositePlots.tex}
 \clearpage
 
 \section{Code}
